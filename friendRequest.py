@@ -1,5 +1,6 @@
 from friendRequestStatus import FriendRequestStatus
 from datetime import date
+from socialUser import SocialUser
 
 class FriendRequest():
     def __init__(self, sender: SocialUser, addressee: SocialUser):

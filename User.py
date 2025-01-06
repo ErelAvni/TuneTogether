@@ -1,11 +1,11 @@
 from hashlib import sha256
-current_id_counter = 0
 
+def get_last_id():
+    '''TODO: load from DB adn get the last last id'''
+    return 0
 
 class User():
     def __init__(self, username: str, password: str, first_name: str, last_name: str, age: int):
-        global current_id_counter
-
         self._username = username
         
         hash_obj = sha256()
@@ -13,8 +13,7 @@ class User():
         
         self._password_hash = hash_obj.hexdigest()
 
-        self._user_id = current_id_counter
-        current_id_counter += 1
+        self._user_id = self.get_last_id() + 1
 
         self._first_name = first_name
         self._last_name = last_name

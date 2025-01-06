@@ -1,4 +1,5 @@
 from datetime import datetime
+from socialUser import SocialUser
 
 class Message():
     def __init__(self, text: str, sender: SocialUser, time_stamp: datetime):
