@@ -9,18 +9,18 @@ class FriendRequest():
         self.__request_date = date.today()
 
     @property
-    def sender():
+    def sender(self):
         return self.__sender
     
     @property
-    def addressee():
+    def addressee(self):
         return self.__addressee
     
     @property
-    def status():
+    def status(self):
         return self.__status
     
     @property
-    def request_date():
+    def request_date(self):
         return self.__request_date
     

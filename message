@@ -1,0 +1,20 @@
+from datetime import datetime
+
+class Message():
+    def __init__(self, text: str, sender: SocialUser, time_stamp: datetime):
+        self.__text = text
+        self.__sender = sender
+        self.__time_stamp = time_stamp
+
+    @property
+    def text(self):
+        return self.__text
+    
+    @property
+    def sender(self):
+        return self.__sender
+    
+    @property
+    def time_stamp(self):
+        return self.__time_stamp
+    

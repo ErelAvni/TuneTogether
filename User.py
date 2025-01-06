@@ -21,26 +21,26 @@ class User():
         self._age = age
 
     @property
-    def username():
+    def username(self):
         return self._username
     
     
     @property
-    def password_hash():
+    def password_hash(self):
         return self._password_hash
     
     @property
-    def user_id():
+    def user_id(self):
         return self._user_id
     
     @property
-    def first_name():
+    def first_name(self):
         return self._first_name
     
     @property
-    def last_name():
+    def last_name(self):
         return self._last_name
     
     @property
-    def age():
+    def age(self):
         return self._age
