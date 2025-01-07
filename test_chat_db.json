@@ -1,0 +1,10 @@
+{
+    "chat_id": 1,
+    "messages": [
+        "hello",
+        "world"
+    ],
+    "encryption_key": [
+        "asefasefasdfase"
+    ]
+}

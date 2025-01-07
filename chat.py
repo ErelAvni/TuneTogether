@@ -2,7 +2,7 @@ from cryptography.fernet import Fernet
 from message import Message
 from abc import ABC
 
-def get_last_id(ABC):
+def get_last_id():
     '''TODO: load from DB adn get the last last id'''
     return 0
 
