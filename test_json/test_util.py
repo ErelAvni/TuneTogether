@@ -1,34 +1,40 @@
 import json
 import os
 
-def get_data_by_path(file_name: str, file_path: str = '') -> dict:
-    if file_path == '':
+def load_data_from_json(file_name : str, path = ""):
+    if path == "":
         full_path = file_name
     else:
-        full_path = os.path.join(file_path, file_name)
+        full_path = os.path.join(file_name, path)
 
-    with open(full_path, 'r') as file:
-        data_dict = json.load(file)
-    return data_dict
+    if not os.path.exists(full_path):
+        print("The file does not exist. Returning empty dict.")
+        return {}
     
+    with open(full_path, 'r') as file:
+        raw_data = file.read()
+        data = json.loads(raw_data)
+    
+    return data
 
-def update_DB_by_path(new_data_dict: dict, file_name: str, file_path: str = '') -> dict:
-    if file_path == '':
+
+def update_data_to_json(data: dict, file_name : str, path = ""):
+    if path == "":
         full_path = file_name
     else:
-        full_path = os.path.join(file_path, file_name)
+        full_path = os.path.join(file_name, path)
 
-    total_data_dict = get_data_by_path(file_name, file_path)
-    total_data_dict.update(new_data_dict)
+    if not os.path.exists(full_path):
+        print("The file does not exist. Not updating anything.")
+        return
+    
+    data_key = data['id']
+    file_data = load_data_from_json(file_name, path)
+    file_data[data_key] = data
 
     with open(full_path, 'w') as file:
-        json.dump(total_data_dict, file, indent=4)
+        json.dump(file_data, file, indent=4)
 
 
-if __name__ == '__main__':
-    chat1 = {}
-    chat1['chat_id'] = 1
-    chat1['messages'] = ["hello", "world"]
-    chat1['encryption_key'] = ["asefasefasdfase"]
-
-    update_DB_by_path(chat1, "test_chat_db.json")
+if __name__ == "__main__":
+    print(load_data_from_json("test_chat_db.json"))
