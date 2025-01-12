@@ -1,11 +1,12 @@
 {
     "1": {
         "id": "1",
-        "text": "NIGGA!!!",
-        "sender": 1
+        "text": "ok",
+        "sender": "1"
     },
     "2": {
-        "text": "this is the second msg by sender_id 1",
+        "id": "2",
+        "text": "ok?",
         "sender": "1"
     }
 }
