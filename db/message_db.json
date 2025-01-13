@@ -1,0 +1,12 @@
+{
+    "1111": {
+        "id": "1",
+        "text": "this is the first message",
+        "sender": "1"
+    },
+    "222222": {
+        "id": "2",
+        "text": "omg a second message already???",
+        "sender": "1"
+    }
+}

@@ -1,7 +1,0 @@
-{
-    "1":
-    {
-        "messages" : ["1", "2"],
-        "encryption_key" : "first_chat_key"
-    }
-}

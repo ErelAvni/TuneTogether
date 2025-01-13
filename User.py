@@ -1,8 +1,11 @@
 from hashlib import sha256
+import db_utils
+
 
 def get_last_id():
-    '''TODO: load from DB adn get the last last id'''
-    return 0
+    users_dict = db_utils.load_data_from_json(db_utils.USER_DB_PATH)
+    sorted_ids = sorted(users_dict.keys())
+    return sorted_ids[-1]
 
 class User():
     def __init__(self, username: str, password: str, first_name: str, last_name: str, age: int):
