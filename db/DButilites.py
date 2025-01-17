@@ -4,7 +4,8 @@ import os
 #CONSTS
 BASE_PATH = os.path.dirname(__file__)
 MESSAGE_DB_PATH = os.path.join(BASE_PATH, "message_db.json")
-CHAT_DB_PATH = os.path.join(BASE_PATH, "chat_db.json")
+PRIVATE_CHAT_DB_PATH = os.path.join(BASE_PATH, "private_chat_db.json")
+GROUP_CHAT_DB_PATH = os.path.join(BASE_PATH, "group_chat_db.json")
 USER_DB_PATH = os.path.join(BASE_PATH, "chat_db.json")
 
 

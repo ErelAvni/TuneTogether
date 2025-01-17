@@ -2,13 +2,10 @@ from cryptography.fernet import Fernet
 from message import Message
 from abc import ABC
 
-def get_last_id():
-    '''TODO: load from DB adn get the last last id'''
-    return 0
 
-class Chat():
-    def __init__(self):
-        self.__chat_id = get_last_id() + 1
+class Chat(ABC):
+    def __init__(self, chat_id: str):
+        self.__chat_id = chat_id
 
         self.__encryption_key = Fernet.generate_key()
         self.__chiper = Fernet(self.__encryption_key)
@@ -30,10 +27,21 @@ class Chat():
     def messages(self):
         return self.__messages
     
+
     def add_message(self, msg: Message):
         '''TODO: update this in the chat DB'''
         self.__messages.append(msg)
     
+
     def decrypt_message(self, msg: Message) -> str:
         decrypted_text_bytes = self.__chiper.decrypt(msg.text)
         return decrypted_text_bytes.decode()
+    
+    
+    def to_dict(self):
+        return {
+            'chat_id': self.chat_id,
+            'chiper': self.chiper,
+            'encryption_key': self.encryption_key,
+            'messages': [msg.message_id for msg in self.messages]
+        }

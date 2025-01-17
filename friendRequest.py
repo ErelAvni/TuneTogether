@@ -25,3 +25,11 @@ class FriendRequest():
     def request_date(self):
         return self.__request_date
     
+
+    def to_dict(self):
+        return {
+            'sender': self.sender.user_id,
+            'addressee': self.addressee.user_id,
+            'status': self.status,
+            'request_date': self.request_date
+        }

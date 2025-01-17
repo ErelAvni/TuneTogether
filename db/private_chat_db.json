@@ -5,6 +5,8 @@
             "111111111",
             "2222222222"
         ],
-        "encryption_key": "different key!"
+        "encryption_key": "different key!",
+        "user1" : "3456543453",
+        "user2" : "4573434"
     }
 }
