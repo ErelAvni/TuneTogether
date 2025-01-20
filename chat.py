@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet
 from message import Message
 from abc import ABC
+import DButilites
 
 
 class Chat(ABC):
@@ -28,9 +29,9 @@ class Chat(ABC):
         return self.__messages
     
 
-    def add_message(self, msg: Message):
-        '''TODO: update this in the chat DB'''
+    def add_message(self, msg: Message, path: str):
         self.__messages.append(msg)
+        DButilites.save_data_to_json(path, self.to_dict())
     
 
     def decrypt_message(self, msg: Message) -> str:

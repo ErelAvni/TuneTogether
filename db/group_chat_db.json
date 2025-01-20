@@ -1,0 +1,31 @@
+{
+    "1": {
+        "groupId": "1",
+        "groupName": "Group Chat 1",
+        "members": ["user1", "user2", "user3"],
+        "messages": [
+            {
+                "sender": "user1",
+                "message": "Hello Group!",
+                "timestamp": "2023-10-01T12:00:00Z"
+            },
+            {
+                "sender": "user2",
+                "message": "Hi there!",
+                "timestamp": "2023-10-01T12:05:00Z"
+            }
+        ]
+    },
+    "2": {
+        "groupId": "2",
+        "groupName": "Group Chat 2",
+        "members": ["user4", "user5"],
+        "messages": [
+            {
+                "sender": "user4",
+                "message": "Welcome to the group.",
+                "timestamp": "2023-10-02T14:00:00Z"
+            }
+        ]
+    }
+}

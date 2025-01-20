@@ -24,3 +24,12 @@ class PrivateChat(Chat):
     def user2(self):
         return self.__user2
 
+
+    def add_message(self, msg):
+        super().add_message(msg, DButilites.PRIVATE_CHAT_DB_PATH)
+
+    def to_dict(self):
+        data_dict = super().to_dict()
+        data_dict['user1'] = self.__user1.user_id
+        data_dict['user2'] = self.__user2.user_id
+        return data_dict
