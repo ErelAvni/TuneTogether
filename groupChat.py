@@ -1,5 +1,5 @@
 from chat import Chat
-from socialUser import SocialUser
+from User import User
 import DButilites
 from message import Message
 
@@ -10,8 +10,9 @@ def get_last_id():
 
 
 class PrivateChat(Chat):
-    def __init__(self, creator : SocialUser):
-        id = str(int(get_last_id()) + 1)
+    def __init__(self, creator : User):
+        last_id = DButilites.get_last_id(DButilites.GROUP_CHAT_DB_PATH)
+        id = str(int(last_id) + 1)
         super().__init__(id)
         self.__creator = creator
         self.__users = [creator]
@@ -37,7 +38,7 @@ class PrivateChat(Chat):
         super().add_message(msg, DButilites.GROUP_CHAT_DB_PATH)
 
 
-    def add_user(self, user : SocialUser):
+    def add_user(self, user : User):
         self.__users.append(user)
         DButilites.save_data_to_json(DButilites.GROUP_CHAT_DB_PATH, self.to_dict())
 

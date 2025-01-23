@@ -1,9 +1,9 @@
 from friendRequestStatus import FriendRequestStatus
 from datetime import date
-from socialUser import SocialUser
+from User import User
 
 class FriendRequest():
-    def __init__(self, sender: SocialUser, addressee: SocialUser):
+    def __init__(self, sender: User, addressee: User):
         self.__sender = sender
         self.__addressee = addressee
         self.__status = FriendRequestStatus.PENDING

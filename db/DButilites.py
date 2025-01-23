@@ -9,6 +9,12 @@ GROUP_CHAT_DB_PATH = os.path.join(BASE_PATH, "group_chat_db.json")
 USER_DB_PATH = os.path.join(BASE_PATH, "user_db.json")
 
 
+def get_last_id(full_path: str):
+    data = load_data_from_json(full_path)
+    sorted_ids = sorted(data.keys())
+    return sorted_ids[-1]
+
+
 def load_data_from_json(full_path: str):
     if not os.path.exists(full_path):
         print("The file does not exist. Returning empty dict.")

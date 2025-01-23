@@ -1,5 +1,5 @@
 from datetime import datetime
-from socialUser import SocialUser
+from User import User
 import DButilites
 
 def get_last_id():
@@ -9,7 +9,7 @@ def get_last_id():
 
 
 class Message():
-    def __init__(self, text: str, sender: SocialUser, time_stamp: datetime):
+    def __init__(self, text: str, sender: User, time_stamp: datetime):
         self.__message_id = str(int(get_last_id()) + 1)
         self.__text = text
         self.__sender = sender
