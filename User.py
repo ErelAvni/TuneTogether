@@ -1,6 +1,6 @@
 from hashlib import sha256
 import DButilites
-from chatHandler import ChatHandler
+from privatechatHandler import PrivateChatHandler
 
 
 class User():
@@ -12,7 +12,8 @@ class User():
         
         self.__password_hash = hash_obj.hexdigest()
 
-        self.__user_id = self.get_last_id() + 1
+        db_raw_id = DButilites.get_last_id(DButilites.MESSAGE_DB_PATH)
+        self.__user_id = str(int(db_raw_id) + 1)
 
         self.__first_name = first_name
         self.__last_name = last_name
@@ -21,8 +22,9 @@ class User():
         self.__friends = []
         self.__friend_requests = []
         self.__private_chats = {} # {friend_id: Chat}
-        self.__group_chats = {} # {friend_id: Chat}
-        self.__chat_handler = ChatHandler(self)
+        self.__group_chats = {} # {name: Chat}
+        self.__private_chat_handler = PrivateChatHandler(self)
+        #TODO: add the group chat handler here
 
     
     @property

@@ -5,10 +5,14 @@ import DButilites
 
 
 class Chat(ABC):
-    def __init__(self, chat_id: str):
+    def __init__(self, chat_id: str, encryption_key: bytes = None):
         self.__chat_id = chat_id
 
-        self.__encryption_key = Fernet.generate_key()
+        if encryption_key:# this is to handle logic of creaintg new chat with new encryption key (when the chat is created with insperation of a different chat)
+            self.__encryption_key = encryption_key
+        else:
+            self.__encryption_key = Fernet.generate_key()
+
         self.__chiper = Fernet(self.__encryption_key)
         self.__messages = []
     
@@ -29,9 +33,9 @@ class Chat(ABC):
         return self.__messages
     
 
-    def add_message(self, msg: Message, path: str):
+    def add_message(self, msg: Message, path: str, data: dict):
         self.__messages.append(msg)
-        DButilites.save_data_to_json(path, self.to_dict())
+        DButilites.save_data_to_json(path, data)
     
 
     def decrypt_message(self, msg: Message) -> str:

@@ -10,7 +10,8 @@ def get_last_id():
 
 class Message():
     def __init__(self, text: str, sender: User, time_stamp: datetime):
-        self.__message_id = str(int(get_last_id()) + 1)
+        db_raw_id = DButilites.get_last_id(DButilites.MESSAGE_DB_PATH)
+        self.__message_id = str(int(db_raw_id) + 1)
         self.__text = text
         self.__sender = sender
         self.__time_stamp = time_stamp
