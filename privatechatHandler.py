@@ -13,7 +13,7 @@ class PrivateChatHandler:
         return self.__user
 
 
-    def start_chat(self, user_id: str):
+    def start_chat(self, user_id: str, flag: bool = False):
         friend_ids = [friend.user_id for friend in self.__user.friends]
         if user_id not in friend_ids:
             print('You can only chat with your friends')
@@ -25,9 +25,13 @@ class PrivateChatHandler:
 
         users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
         addressee = users[user_id]
-        this_private_chat = PrivateChat(self.__user, addressee)
-        self.__user.__private_chats[user_id] = this_private_chat
-        addressee_private_chat = PrivateChat(addressee, self.__user, this_private_chat.encryption_key)
-        addressee.__private_chats[self.__user.user_id] = addressee_private_chat
+        private_chat = PrivateChat(self.__user, addressee)
+        self.__user.__private_chats[user_id] = private_chat
 
+        users[self.__user.user_id] = self.__user.to_dict()
+
+        if not flag:
+            addressee.private_chat_handler.start_chat(self.__user.user_id, True)
+
+        
         #TODO: save the private chats to the database. This includes the chats and the users, I think that each are saved in a different database so it's a different function for each one

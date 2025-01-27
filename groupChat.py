@@ -50,3 +50,4 @@ class GroupChat(Chat):
         data_dict['users'] = [self.__users.user_id for user in self.__users]
         data_dict['users'] = self.__managers
         return data_dict
+

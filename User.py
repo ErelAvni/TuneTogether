@@ -77,6 +77,11 @@ class User():
         return self.__group_chats
     
 
+    @property
+    def private_chat_handler(self):
+        return self.__private_chat_handler
+
+
     def to_dict(self):
         return {
             'username': self.username,
@@ -84,5 +89,10 @@ class User():
             'user_id': self.user_id,
             'first_name': self.first_name,
             'last_name': self.last_name,
-            'age': self.age
+            'age': self.age,
+            'friends': [friend.user_id for friend in self.friends],
+            'friend_requests': [friend_request for friend_request in self.friend_requests],
+            'private_chats': [private_chat.chat_id for private_chat in self.private_chats],
+            'group_chats': [group_chat.chat_id for group_chat in self.group_chats],
+            'private_chat_handler': self.private_chat_handler
         }
