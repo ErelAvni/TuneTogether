@@ -1,0 +1,6 @@
+0. Make sure that the PYTHONPATH is good to go after changing the relative path of chat modules
+1. Go over every single class and make sure that every ctor can take in all of the props
+this is the ground work for from_dict() methods, that are required in order to get instances from the db
+and not only the dict of that instance.
+2. Create the from_dict() method for each non-abstract class, so that if an object is being getted from the 
+db by the end of the from_dict() sequence the object is fully recovered, nested objects and all
