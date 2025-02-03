@@ -2,9 +2,17 @@ from friendRequestStatus import FriendRequestStatus
 from datetime import date
 from User import User
 import DButilites
+from datetime import datetime
 
 class FriendRequest():
     def __init__(self, sender: User, addressee: User, status: FriendRequestStatus = FriendRequestStatus.PENDING, request_date: date = date.today()):
+        """
+        Creates a new friend request object
+        :param sender: the user who sent the friend request
+        :param addressee: the user who received the friend request
+        :param status: the status of the friend request, Enum of FriendRequestStatus
+        :param request_date: the date the friend request was sent
+        """
         self.__sender = sender
         self.__addressee = addressee
         self.__status = status
@@ -31,16 +39,21 @@ class FriendRequest():
         return {
             'sender': self.sender.user_id,
             'addressee': self.addressee.user_id,
-            'status': self.status,
-            'request_date': self.request_date
+            'status': self.status.value,
+            'request_date': self.request_date.isoformat()
         }
     
 
-    @staticmethod
+    @classmethod
     def from_dict(data_dict: dict):
+        """
+        class method that creates a new FriendRequest object from a dictionary.
+        Dictionary is expected to be the output of the to_dict method.
+        """
         users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
-        sender = users[data_dict['sender']]#this is extracting the user object from the user id, therefore datadict gets the id, not the full user object
-        addressee = users[data_dict['addressee']]
-        status = data_dict['status']
-        request_date = data_dict['request_date']
+        sender = User.from_dict(users[data_dict['sender']])
+        addressee = User.from_dict(users[data_dict['addressee']])
+
+        status = FriendRequestStatus(data_dict['status'])
+        request_date = datetime.fromisoformat(data_dict['request_date'])
         return FriendRequest(sender, addressee, status, request_date)

@@ -68,7 +68,7 @@ class GroupChat(Chat):
         Adds a user to the chat. Saves the data to the group chat database
         """
         self.__users.append(user)
-        DButilites.save_data_to_json(DButilites.GROUP_CHAT_DB_PATH, self.to_dict())
+        DButilites.update_data_to_json(DButilites.GROUP_CHAT_DB_PATH, self.to_dict())
 
 
     def to_dict(self):
@@ -91,8 +91,8 @@ class GroupChat(Chat):
         data_dict is expected to be the output of the to_dict method.
         """
         all_users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
-        creator = all_users[data_dict['creator']]
-        users = [all_users[user_id] for user_id in data_dict['users']]
+        creator = User.from_dict(all_users[data_dict['creator']])
+        users = [User.from_dict(all_users[user_id]) for user_id in data_dict['users']]
         managers = data_dict['managers']
 
         name = data_dict['name']
@@ -100,6 +100,6 @@ class GroupChat(Chat):
         encryption_key = data_dict['encryption_key']
 
         all_messages = DButilites.load_data_from_json(DButilites.MESSAGE_DB_PATH)
-        messages = [all_messages[message_id] for message_id in data_dict['messages']]
+        messages = [Message.from_dict(all_messages[message_id]) for message_id in data_dict['messages']]
 
         return GroupChat(name, creator, chat_id, users, managers, encryption_key, messages)

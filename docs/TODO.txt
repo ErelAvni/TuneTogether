@@ -1,3 +1,6 @@
+THERE IS AN URGENT NEED TO UNDERSTAND WHAT TO SAVE, WHEN AND WHERE. UPDATED NECESERY IN CHAT CLASSES 
+SO FAR REGARDING SAVING AND ADDING MESSAGES OR USERS.
+
 0. Make sure that the PYTHONPATH is good to go after changing the relative path of chat modules
 1. Go over every single class and make sure that every ctor can take in all of the props
 this is the ground work for from_dict() methods, that are required in order to get instances from the db

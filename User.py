@@ -4,7 +4,9 @@ from privatechatHandler import PrivateChatHandler
 
 
 class User():
-    def __init__(self, username: str, password: str, first_name: str, last_name: str, age: int):
+    def __init__(self, username: str, password: str, first_name: str, last_name: str, age: int,
+                 user_id : str = None, friends : list = None, friend_requests : list = None, 
+                 private_chats = None, group_chats = None,):
         self.__username = username
         
         hash_obj = sha256()

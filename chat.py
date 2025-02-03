@@ -54,7 +54,7 @@ class Chat(ABC):
         :param path: the path to the json file. Provided by the subclasses
         """
         self.__messages.append(msg)
-        DButilites.save_data_to_json(path, data)
+        DButilites.update_data_to_json(path, data)
     
 
     def decrypt_message(self, msg: Message) -> str:

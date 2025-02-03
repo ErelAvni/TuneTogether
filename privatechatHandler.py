@@ -4,8 +4,14 @@ import DButilites
 
 
 class PrivateChatHandler:
-    def __init__(self, User: User):
-        self.__user = User
+    def __init__(self, user: User):
+        """
+        Creates a private chat handler for the user. 
+        This handler is exclusive to the user and is used to manage the private chats of the user.
+        :param User: the user that the handler is created for. User should pass itself by reference in 
+        it's constructor, giving the handler access to the user's properties.
+        """
+        self.__user = user
         
 
     @property
@@ -14,6 +20,9 @@ class PrivateChatHandler:
 
 
     def start_chat(self, user_id: str, flag: bool = False):
+        """
+        starts a chat with a user based on theirs user_id. Only friends can be chatted with.
+        """
         friend_ids = [friend.user_id for friend in self.__user.friends]
         if user_id not in friend_ids:
             print('You can only chat with your friends')

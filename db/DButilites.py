@@ -28,6 +28,11 @@ def load_data_from_json(full_path: str):
 
 
 def update_data_to_json(data: dict, full_path: str):
+    """
+    Updates the data in the file at the given path.
+    If the file does not exist, it will not update anything.
+    Expecting the data to be a dictionary with a key 'id' that is unique.
+    """
     if not os.path.exists(full_path):
         print("The file does not exist. Not updating anything.")
         return
