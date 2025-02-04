@@ -1,0 +1,17 @@
+from User import User
+from groupChat import GroupChat
+import DButilites
+
+
+class GroupChatHandler:
+    def __init__(self, user: User):
+        """
+        Creates a group chat handler for the user.
+        This handler is exclusive to the user and is used to manage the group chats that the user is in.
+        :param User: the user that the handler is created for. User should pass itself by reference in 
+        it's constructor, giving the handler access to the user's properties.
+        """
+        self.__user = user
+
+
+    

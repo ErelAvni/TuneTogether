@@ -19,9 +19,14 @@ class PrivateChatHandler:
         return self.__user
 
 
-    def start_chat(self, user_id: str, flag: bool = False):
+    def start_chat(self, user_id: str, flag: bool = False, private_chat : PrivateChat = None):
         """
         starts a chat with a user based on theirs user_id. Only friends can be chatted with.
+        For each successful chat creation, both users are updated with the new chat.
+        This causes the function to be ran twice for each chat creation, once for each user.
+        :param user_id: the user_id of the user that the chat is started with.
+        :param flag = False: first time using this method. True: second time using this method.
+        :param private_chat = If provided, this param is the chat needed to be created. Should only be provided if flag is True. If not provided, a new chat is created.
         """
         friend_ids = [friend.user_id for friend in self.__user.friends]
         if user_id not in friend_ids:
@@ -33,14 +38,18 @@ class PrivateChatHandler:
             return
 
         users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
-        addressee = users[user_id]
-        private_chat = PrivateChat(self.__user, addressee)
+        addressee = User.from_dict(users[user_id])
+        if not private_chat:
+            private_chat = PrivateChat(self.__user, addressee)
         self.__user.__private_chats[user_id] = private_chat
 
         users[self.__user.user_id] = self.__user.to_dict()
 
         if not flag:
-            addressee.private_chat_handler.start_chat(self.__user.user_id, True)
+            addressee.private_chat_handler.start_chat(self.__user.user_id, True, private_chat)
 
-        
-        #TODO: save the private chats to the database. This includes the chats and the users, I think that each are saved in a different database so it's a different function for each one
+        private_chat_dict = private_chat.to_dict()
+        DButilites.update_data_to_json(DButilites.PRIVATE_CHAT_DB_PATH, private_chat_dict)
+        DButilites.update_data_to_json(DButilites.USER_DB_PATH, users)
+
+        print(f"Private chat created between user {self.__user.username} and user {addressee.username}")
