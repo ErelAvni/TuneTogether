@@ -6,7 +6,7 @@ from privatechatHandler import PrivateChatHandler
 class User():
     def __init__(self, username: str, password: str, first_name: str, last_name: str, age: int,
                  user_id : str = None, friends : list = None, friend_requests : list = None, 
-                 private_chats = None, group_chats = None,):
+                 private_chats : list = None, group_chats : list = None,):
         self.__username = username
         
         hash_obj = sha256()
@@ -23,8 +23,8 @@ class User():
 
         self.__friends = []
         self.__friend_requests = []
-        self.__private_chats = {} # {friend_id: Chat}
-        self.__group_chats = {} # {name: Chat}
+        self.__private_chats = []
+        self.__group_chats = []
         self.__private_chat_handler = PrivateChatHandler(self)
         #TODO: add the group chat handler here
 

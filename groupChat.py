@@ -65,9 +65,17 @@ class GroupChat(Chat):
 
     def add_user(self, user : User):
         """
-        Adds a user to the chat. Saves the data to the group chat database
+        Adds a user to the chat on chat's end. Saves the data to the group chat database. Not responsible for updating the user's data.
         """
         self.__users.append(user)
+        DButilites.update_data_to_json(DButilites.GROUP_CHAT_DB_PATH, self.to_dict())
+
+
+    def remove_user(self, user : User):
+        """
+        Removes a user from the chat on chat's end. Saves the data to the group chat database. Not responsible for updating the user's data.
+        """
+        self.__users.remove(user)
         DButilites.update_data_to_json(DButilites.GROUP_CHAT_DB_PATH, self.to_dict())
 
 

@@ -14,4 +14,41 @@ class GroupChatHandler:
         self.__user = user
 
 
+    def create_group_chat(self, name: str):
+        """
+        Creates a group chat with the given name.
+        :param name: the name of the group chat.
+        """
+        group_chat = GroupChat(name, self.__user)
+        self.__user.__group_chats.append(group_chat)
+
+        users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
+        users[self.__user.user_id] = self.__user.to_dict()
+        DButilites.update_data_to_json(DButilites.USER_DB_PATH, users)
+        DButilites.update_data_to_json(DButilites.GROUP_CHAT_DB_PATH, group_chat.to_dict())
+
+        print(f"group chat \"{name}\" was created successfully.")
+
+    
+    def add_user_to_group_chat(self, group_chat: GroupChat, user: User):
+        """
+        Adds a user to the group chat. Only available to the group managers.
+        :param group_chat: the group chat to add the user to.
+        :param user: the user to add to the group chat.
+        """
+        if self.__user.user_id not in group_chat.managers.keys():
+            print(f"You cannot add a user to group chat \"{group_chat.name}\" if you are not a manager.")
+            return
+
+        group_chat.add_user(user)
+        user.__group_chats.append(group_chat)
+
+        users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
+        users[user.user_id] = user.to_dict()
+        DButilites.update_data_to_json(DButilites.USER_DB_PATH, users)
+        #not updating the group chat DB because it's already being updated in the group_chat.add_user() method
+
+        print(f"user \"{user.username}\" was added to group chat \"{group_chat.name}\" successfully.")
+
+    
     

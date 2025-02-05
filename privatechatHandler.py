@@ -41,7 +41,7 @@ class PrivateChatHandler:
         addressee = User.from_dict(users[user_id])
         if not private_chat:
             private_chat = PrivateChat(self.__user, addressee)
-        self.__user.__private_chats[user_id] = private_chat
+        self.__user.__private_chats.append(private_chat)
 
         users[self.__user.user_id] = self.__user.to_dict()
 
