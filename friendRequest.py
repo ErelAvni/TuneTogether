@@ -5,7 +5,7 @@ import DButilites
 from datetime import datetime
 
 class FriendRequest():
-    def __init__(self, sender: User, addressee: User, status: FriendRequestStatus = FriendRequestStatus.PENDING, request_date: date = date.today()):
+    def __init__(self, sender: User, addressee: User, status: FriendRequestStatus = FriendRequestStatus.PENDING, request_date: datetime = datetime.today()):
         """
         Creates a new friend request object
         :param sender: the user who sent the friend request
