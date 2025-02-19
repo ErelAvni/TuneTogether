@@ -1,6 +1,7 @@
 from User import User
 from groupChat import GroupChat
 import DButilites
+from message import Message
 
 
 class GroupChatHandler:
@@ -107,7 +108,7 @@ class GroupChatHandler:
     def receive_message(self, group_chat: GroupChat, message: str):
         """
         Receives a message from the group chat. Only available to the users that are in the group chat.
-        Not responsible for sending the message, nor for saving it for everyone else in the group chat or saving it in th
+        Not responsible for sending the message, nor for saving it for everyone else in the group chat or saving it in the db
         :param group_chat: the group chat that the message is from.
         :param message: the message that was received.
         """
@@ -118,3 +119,18 @@ class GroupChatHandler:
         self.__user.group_chats[group_chat].add_message(message)
 
         print(f"Message received from group chat \"{group_chat.name}\" successfully.")
+
+    
+    def send_message(self, group_chat: GroupChat, message: Message):
+        """
+        Sends a message to the group chat. Only available to the users that are in the group chat.
+        Calls the receive_message method for each user in the group chat, meaning that the method is responsible for sending the message to everyone in the group chat.
+        """
+        if group_chat not in self.__user.group_chats:
+            print("You cannot send a message to a group chat that you are not in.")
+            return
+        
+        for user in group_chat.users:
+            user.group_chat_handler.receive_message(group_chat, message)
+
+        print(f"Message sent to group chat \"{group_chat.name}\" successfully.")
