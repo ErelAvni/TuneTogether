@@ -6,3 +6,9 @@ this is the ground work for from_dict() methods, that are required in order to g
 and not only the dict of that instance.
 2. Create the from_dict() method for each non-abstract class, so that if an object is being getted from the 
 db by the end of the from_dict() sequence the object is fully recovered, nested objects and all
+
+
+Create server and client for when users send eachother messages, the server is used to route the messages 
+between the clients. NOTE FOR SELF: ASK HOW IP ECT IS USED 
+
+FIRST THING TO DO WHEN STARTING TO WORK AGAIN - FIX CIRCULAR IMPORT PROBLEM

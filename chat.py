@@ -1,7 +1,7 @@
 from cryptography.fernet import Fernet
 from message import Message
 from abc import ABC
-import DButilites
+import db.DButilites as DButilites
 
 
 class Chat(ABC):
