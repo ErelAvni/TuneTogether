@@ -1,5 +1,5 @@
 from hashlib import sha256
-import db.DButilites as DButilites
+import new.db.DButilites as DButilites
 from privateChat import PrivateChat
 from groupChat import GroupChat
 from privatechatHandler import PrivateChatHandler

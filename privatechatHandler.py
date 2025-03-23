@@ -1,6 +1,6 @@
 from User import User
 from privateChat import PrivateChat
-import DButilites
+import new.db.DButilites as DButilites
 
 
 class PrivateChatHandler:

@@ -1,7 +1,7 @@
 from friendRequestStatus import FriendRequestStatus
 from datetime import date
 from User import User
-import DButilites
+import new.db.DButilites as DButilites
 from datetime import datetime
 
 class FriendRequest():

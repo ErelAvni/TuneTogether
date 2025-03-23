@@ -1,29 +1,51 @@
+import json
+
+
 class ServerRequest:
     """
     Represents a request sent by the client to the server.
     """
     # Request codes
-    PLAY_SONG = "PLAY_SONG"
-    STOP_SONG = "STOP_SONG"
-    COMMENT = "COMMENT"
+    global LOGIN 
     LOGIN = "LOGIN"
+    global REGISTER
     REGISTER = "REGISTER"
+    global PLAY_SONG
+    PLAY_SONG = "PLAY_SONG"
+    global STOP_SONG
+    STOP_SONG = "STOP_SONG"
+    global COMMENT
+    COMMENT = "COMMENT"
 
     def __init__(self, request_code, payload=None):
         """
         Initialize a ServerRequest instance.
 
         :param request_code: The type of request (e.g., COMMENT, LOGIN, REGISTER).
-        :param payload: Additional data for the request (optional).
+        :param payload: Additional data for the request.
         """
-        if request_code not in {self.COMMENT, self.LOGIN, self.REGISTER}:
-            raise ValueError(f"Invalid request code: {request_code}")
+        self.request_code = request_code
+        self.payload = payload
 
-        self.__request_code = request_code
-        if payload:
-            self.__payload = payload
-        else:
-            self.__payload = ""
+
+    @staticmethod
+    def create_login_payload(username: str, password_hash: str):
+        payload = {
+            "username": username,
+            "password_hash": password_hash
+        }
+        return ServerRequest(LOGIN, payload)
+    
+
+    @staticmethod
+    def create_register_payload(username: str, password_hash: str, age: int):
+        payload = {
+            "username": username,
+            "password_hash": password_hash, 
+            "age": age
+        }
+        return ServerRequest(REGISTER, payload)
+    
 
     def to_dict(self):
         """
@@ -36,12 +58,11 @@ class ServerRequest:
             "payload": self.__payload
         }
 
-    @classmethod
-    def from_dict(cls, data):
-        """
-        Create a ServerRequest instance from a dictionary.
 
-        :param data: A dictionary containing request data.
-        :return: A ServerRequest instance.
+    def to_json(self):
         """
-        return ServerRequest(data['request_code'], data['payload'])
+        Convert the request to a JSON string for transmission.
+
+        :return: A JSON representation of the request.
+        """
+        return json.dumps(self.to_dict())

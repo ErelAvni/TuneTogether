@@ -1,6 +1,6 @@
 from User import User
 from groupChat import GroupChat
-import DButilites
+import new.db.DButilites as DButilites
 from message import Message
 
 

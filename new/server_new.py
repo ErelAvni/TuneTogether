@@ -1,5 +1,8 @@
 import socket
 import threading
+import json
+import os
+import db.DButilites as DButilites
 
 
 class TuneTogetherServer:
@@ -38,6 +41,22 @@ class TuneTogetherServer:
 
     def add_comment(self, comment: str):
         pass
+
+
+    def login(self, username: str, password_hash: str):
+        users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
+        
+        if username not in users:
+            print(f"User {username} not found.")
+            return False
+        
+        user = users[username]
+        if user['password_hash'] != password_hash:
+            print(f"Invalid password for user {username}.")
+            return False
+        
+        print(f"User {username} logged in.")
+        return True
 
 
 def main():

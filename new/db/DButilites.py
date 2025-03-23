@@ -3,16 +3,7 @@ import os
 
 #CONSTS
 BASE_PATH = os.path.dirname(__file__)
-MESSAGE_DB_PATH = os.path.join(BASE_PATH, "message_db.json")
-PRIVATE_CHAT_DB_PATH = os.path.join(BASE_PATH, "private_chat_db.json")
-GROUP_CHAT_DB_PATH = os.path.join(BASE_PATH, "group_chat_db.json")
-USER_DB_PATH = os.path.join(BASE_PATH, "user_db.json")
-
-
-def get_last_id(full_path: str):
-    data = load_data_from_json(full_path)
-    sorted_ids = sorted(data.keys())
-    return sorted_ids[-1]
+USER_DB_PATH = os.path.join(BASE_PATH, "users.json")
 
 
 def load_data_from_json(full_path: str):
@@ -31,13 +22,13 @@ def update_data_to_json(data: dict, full_path: str):
     """
     Updates the data in the file at the given path.
     If the file does not exist, it will not update anything.
-    Expecting the data to be a dictionary with a key 'id' that is unique.
+    Expecting the data to be a dictionary with a key 'username' that is unique.
     """
     if not os.path.exists(full_path):
         print("The file does not exist. Not updating anything.")
         return
     
-    data_key = data['id']
+    data_key = data['username']
     file_data = load_data_from_json(full_path)
     file_data[data_key] = data
 

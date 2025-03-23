@@ -1,7 +1,7 @@
 from chat import Chat
 from User import User
 from message import Message
-import DButilites
+import new.db.DButilites as DButilites
 
 
 class PrivateChat(Chat):

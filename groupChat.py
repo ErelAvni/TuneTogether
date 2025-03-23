@@ -1,6 +1,6 @@
 from chat import Chat
 from User import User
-import DButilites
+import new.db.DButilites as DButilites
 from message import Message
 
 
