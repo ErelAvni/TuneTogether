@@ -2,8 +2,9 @@ class ServerRequest:
     """
     Represents a request sent by the client to the server.
     """
-
     # Request codes
+    PLAY_SONG = "PLAY_SONG"
+    STOP_SONG = "STOP_SONG"
     COMMENT = "COMMENT"
     LOGIN = "LOGIN"
     REGISTER = "REGISTER"
@@ -18,8 +19,11 @@ class ServerRequest:
         if request_code not in {self.COMMENT, self.LOGIN, self.REGISTER}:
             raise ValueError(f"Invalid request code: {request_code}")
 
-        self.request_code = request_code
-        self.payload = payload or {}
+        self.__request_code = request_code
+        if payload:
+            self.__payload = payload
+        else:
+            self.__payload = ""
 
     def to_dict(self):
         """
@@ -28,8 +32,8 @@ class ServerRequest:
         :return: A dictionary representation of the request.
         """
         return {
-            "request_code": self.request_code,
-            "payload": self.payload
+            "request_code": self.__request_code,
+            "payload": self.__payload
         }
 
     @classmethod
