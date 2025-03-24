@@ -1,21 +1,16 @@
 import json
 
+# Request codes
+LOGIN = "LOGIN"
+REGISTER = "REGISTER"
+PLAY_SONG = "PLAY_SONG"
+STOP_SONG = "STOP_SONG"
+COMMENT = "COMMENT"
 
 class ServerRequest:
     """
     Represents a request sent by the client to the server.
     """
-    # Request codes
-    global LOGIN 
-    LOGIN = "LOGIN"
-    global REGISTER
-    REGISTER = "REGISTER"
-    global PLAY_SONG
-    PLAY_SONG = "PLAY_SONG"
-    global STOP_SONG
-    STOP_SONG = "STOP_SONG"
-    global COMMENT
-    COMMENT = "COMMENT"
 
     def __init__(self, request_code, payload=None):
         """
@@ -54,8 +49,8 @@ class ServerRequest:
         :return: A dictionary representation of the request.
         """
         return {
-            "request_code": self.__request_code,
-            "payload": self.__payload
+            "request_code": self.request_code,
+            "payload": self.payload
         }
 
 
@@ -66,3 +61,7 @@ class ServerRequest:
         :return: A JSON representation of the request.
         """
         return json.dumps(self.to_dict())
+    
+
+    def __str__(self):
+        return f"ServerRequest(request_code={self.request_code}, payload={self.payload})"
