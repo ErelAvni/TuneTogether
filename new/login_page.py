@@ -1,58 +1,57 @@
 import tkinter as tk
+from client_new import Client
+from page import Page
 import hashlib
+from server_request_new import ServerRequest
+
+class LoginPage(Page):
+    def __init__(self, parent, controller, connected_client: Client):
+        super().__init__(parent, controller, connected_client, bg_param="#95DBCD")
+
+        # Custom Fonts
+        self.title_font = ("Arial", 50, "bold")
+        self.label_font = ("Arial", 20)
+        self.button_font = ("Arial", 20)
+
+        # Title Label
+        self.title_label = tk.Label(self, text="LOGIN", font=self.title_font, bg="#95DBCD")
+        self.title_label.pack(pady=30)
+
+        # Username Label and Entry
+        self.username_label = tk.Label(self, text="Enter username:", font=self.label_font, bg="#95DBCD")
+        self.username_label.pack()
+        self.username_entry = tk.Entry(self, font=self.label_font, bg="#BFC6C7", width=20)
+        self.username_entry.pack(pady=5)
+
+        # Password Label and Entry
+        self.password_label = tk.Label(self, text="Enter password:", font=self.label_font, bg="#95DBCD")
+        self.password_label.pack()
+        self.password_entry = tk.Entry(self, font=self.label_font, bg="#BFC6C7", width=20, show="*")
+        self.password_entry.pack(pady=5)
+
+        # Login Button
+        self.login_button = tk.Button(self, text="Login", font=self.button_font, bg="#639A97", fg="white", width=20, height=1, command=lambda: self.login(self.username_entry.get(), self.password_entry.get()))
+        self.login_button.pack(pady=(30, 15))
+
+        # Register Section
+        self.register_frame = tk.Frame(self, bg="#95DBCD")
+        self.register_frame.pack(side="bottom", pady=(0, 50))
+        
+        self.register_text = tk.Label(self.register_frame, text="Don't have an account yet?", font=self.label_font, bg="#95DBCD")
+        self.register_text.pack()
+        
+        self.register_button = tk.Button(self.register_frame, text="Register", font=self.button_font, bg="#639A97", fg="white", width=20, height=1, command=lambda: controller.show_frame("RegisterPage"))
+        self.register_button.pack(pady=10)
 
 
-def hash_password(password: str) -> str:
-    """
-    Hash the given password using SHA-256.
+    def login(self, username: str, password: str):
+        '''Sends a login request to the server'''
+        print(f"username: {username}, password: {password}")
+        password_hash = self.hash_password(password)
+        request = ServerRequest.create_login_payload(username, password_hash)
+        response = self.connected_client.send_request(request)
 
-    :param password: The password to hash.
-    :return: The hashed password.
-    """
-    return hashlib.sha256(password.encode()).hexdigest()
-
-
-def create_login_ui():
-    root = tk.Tk()
-    root.title("Login Page")
-    root.geometry("1000x600")
-    root.configure(bg="#95DBCD")
-
-    # Custom Fonts
-    title_font = ("Arial", 50, "bold")
-    label_font = ("Arial", 20)
-    button_font = ("Arial", 20)
-
-    # Title Label
-    title_label = tk.Label(root, text="LOGIN", font=title_font, bg="#95DBCD")
-    title_label.pack(pady=30)
-
-    # Username Label and Entry
-    username_label = tk.Label(root, text="Enter username:", font=label_font, bg="#95DBCD")
-    username_label.pack()
-    username_entry = tk.Entry(root, font=label_font, bg="#BFC6C7", width=20)
-    username_entry.pack(pady=5)
-
-    # Password Label and Entry
-    password_label = tk.Label(root, text="Enter password:", font=label_font, bg="#95DBCD")
-    password_label.pack()
-    password_entry = tk.Entry(root, font=label_font, bg="#BFC6C7", width=20, show="*")
-    password_entry.pack(pady=5)
-
-    # Login Button
-    login_button = tk.Button(root, text="Login", font=button_font, bg="#639A97", fg="white", width=20, height=1)
-    login_button.pack(pady=15)
-
-    # Register Section
-    register_frame = tk.Frame(root, bg="#95DBCD")
-    register_frame.pack(side="bottom", pady=(0, 50))
     
-    register_text = tk.Label(register_frame, text="Don't have an account yet?", font=label_font, bg="#95DBCD")
-    register_text.pack()
-    
-    register_button = tk.Button(register_frame, text="Register", font=button_font, bg="#639A97", fg="white", width=20, height=1)
-    register_button.pack(pady=10)
-
-    root.mainloop()
-
-create_login_ui()
+    def hash_password(self, password: str):
+        '''hashes the password using the SHA-256 algorithm'''
+        return hashlib.sha256(password.encode()).hexdigest()

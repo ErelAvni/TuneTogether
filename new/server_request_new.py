@@ -25,6 +25,7 @@ class ServerRequest:
 
     @staticmethod
     def create_login_payload(username: str, password_hash: str):
+        '''creates a payload for the login request. returns a ServerRequest object'''
         payload = {
             "username": username,
             "password_hash": password_hash
