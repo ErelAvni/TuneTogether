@@ -3,6 +3,7 @@ import threading
 import json
 from server_request_new import ServerRequest, LOGIN, REGISTER, PLAY_SONG, STOP_SONG, COMMENT
 import db.DButilites as DButilites
+from server_response import ServerResponse, OK, DATA_NOT_FOUND, UNAUTHORIZED, INVALID_REQUEST, INVALID_DATA, INTERNAL_ERROR
 
 
 class TuneTogetherServer:
@@ -38,10 +39,16 @@ class TuneTogetherServer:
                     request = ServerRequest(request_dict['request_code'], request_dict['payload'])
 
                     if request.request_code == LOGIN:
-                        self.login_client(request.payload['username'], request.payload['password_hash'])
+                        response_json = self.login_client(request.payload['username'], request.payload['password_hash'])
 
                     elif request.request_code == REGISTER:
-                        self.register_client(request.payload['username'], request.payload['password_hash'], request.payload['age'])
+                        response_json = self.register_client(request.payload['username'], request.payload['password_hash'], request.payload['age'])
+
+                    else:
+                        response = ServerResponse(INVALID_REQUEST, "Invalid request code.")
+                        response_json = response.to_json()
+
+                    conn_socket.send(response_json.encode('utf-8'))
 
                 except Exception as e:
                     print(f"Error handling request from {addr}: {e}")
@@ -52,34 +59,40 @@ class TuneTogetherServer:
         users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
 
         if username not in users:
-            print(f"User {username} not found.")
-            return False
+            response = ServerResponse(DATA_NOT_FOUND, f"User {username} not found.")
         
         user = users[username]
         if user['password_hash'] != password_hash:
-            print(f"Invalid password for user {username}.")
-            return False
+            response = ServerResponse(UNAUTHORIZED, "Invalid password.")
         
-        
-        print(f"User {username} logged in.")
-        return True
+        else:
+            response = ServerResponse(OK, f"User {username} logged in.")
+            print(f"User {username} logged in.")
+
+        return response.to_json()
 
 
     def register_client(self, username: str, password_hash: str, age: int):
         users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
 
         if username in users:
-            print(f"Username \"{username}\" already taken.")
-            return False
+            resopnse = ServerResponse(INVALID_DATA, f"Username \"{username}\" already taken.")
+            return resopnse.to_json()
         
         user_dict = {
             "username": username,
             "password_hash": password_hash,
             "age": age
         }
-        DButilites.update_data_to_json(user_dict, DButilites.USER_DB_PATH)
-        print(f"User {username} registered.")
-        return True
+
+        if (DButilites.update_data_to_json(user_dict, DButilites.USER_DB_PATH)):
+            print(f"User {username} registered.")
+            response = ServerResponse(OK, f"User {username} registered.").to_json()
+        
+        else:
+            response = ServerResponse(INVALID_DATA, "Error while registering user.").to_json()
+        
+        return response
 
 
 def main():

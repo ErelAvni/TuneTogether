@@ -26,7 +26,7 @@ def update_data_to_json(data: dict, full_path: str):
     """
     if not os.path.exists(full_path):
         print("The file does not exist. Not updating anything.")
-        return
+        return False
     
     data_key = data['username']
     file_data = load_data_from_json(full_path)
@@ -36,8 +36,10 @@ def update_data_to_json(data: dict, full_path: str):
         with open(full_path, 'w') as file:
             json.dump(file_data, file, indent=4)
         print(f"Successfully wrote to {full_path}")
+        return True
     except Exception as e:
         print(f"Error while writing to file: {e}")
+        return False
 
 
 if __name__ == "__main__":
