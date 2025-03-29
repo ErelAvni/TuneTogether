@@ -61,13 +61,14 @@ class TuneTogetherServer:
         if username not in users:
             response = ServerResponse(DATA_NOT_FOUND, f"User {username} not found.")
         
-        user = users[username]
-        if user['password_hash'] != password_hash:
-            response = ServerResponse(UNAUTHORIZED, "Invalid password.")
-        
         else:
-            response = ServerResponse(OK, f"User {username} logged in.")
-            print(f"User {username} logged in.")
+            user = users[username]
+            if user['password_hash'] != password_hash:
+                response = ServerResponse(UNAUTHORIZED, "Invalid password.")
+            
+            else:
+                response = ServerResponse(OK, f"User {username} logged in.")
+                print(f"User {username} logged in.")
 
         return response.to_json()
 

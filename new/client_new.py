@@ -29,16 +29,17 @@ class Client:
 
             # Wait for the server's response
             response_data = self.client_socket.recv(1024)
+            print(f"Received response: {response_data}")
             response_json = response_data.decode('utf-8')
             response_dict = json.loads(response_json)
-            response = ServerResponse(response_dict['status'], response_dict['message'])
+            response = ServerResponse(response_dict['status_code'], response_dict['message'])
             return response
 
         except Exception as e:
             print(f"Error sending request: {e}")
             return None
 
-    
+
     def close(self):
         self.client_socket.close()
         print("Connection closed.")

@@ -4,7 +4,7 @@ from client_new import Client
 from page import Page
 from server_request_new import ServerRequest
 import hashlib
-
+from server_response import ServerResponse
 
 class RegisterPage(Page):
     def __init__(self, parent, controller, connected_client: Client):
@@ -58,3 +58,17 @@ class RegisterPage(Page):
         password_hash = self.hash_password(password)
         request = ServerRequest.create_register_payload(username, password_hash, age)
         response = self.connected_client.send_request(request)
+        self.handle_response(response)
+
+
+    def handle_response(self, response: ServerResponse):
+        """
+        Handle the server response.
+        :param response: The server response to handle.
+        """
+        if response.response_code == "OK":
+            messagebox.showinfo("Success", "register successful!")
+            # Proceed to the next page or functionality
+            self.controller.show_frame("MainPage")
+        else:
+            super().handle_response(response)

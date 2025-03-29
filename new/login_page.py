@@ -3,6 +3,9 @@ from client_new import Client
 from page import Page
 import hashlib
 from server_request_new import ServerRequest
+from server_response import ServerResponse
+from tkinter import messagebox
+
 
 class LoginPage(Page):
     def __init__(self, parent, controller, connected_client: Client):
@@ -50,8 +53,22 @@ class LoginPage(Page):
         password_hash = self.hash_password(password)
         request = ServerRequest.create_login_payload(username, password_hash)
         response = self.connected_client.send_request(request)
+        self.handle_response(response)
 
     
     def hash_password(self, password: str):
         '''hashes the password using the SHA-256 algorithm'''
         return hashlib.sha256(password.encode()).hexdigest()
+    
+
+    def handle_response(self, response: ServerResponse):
+        """
+        Handle the server response.
+        :param response: The server response to handle.
+        """
+        if response.response_code == "OK":
+            messagebox.showinfo("Success", "Login successful!")
+            # Proceed to the next page or functionality
+            self.controller.show_frame("MainPage")
+        else:
+            super().handle_response(response)
