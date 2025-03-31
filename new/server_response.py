@@ -11,15 +11,17 @@ INTERNAL_ERROR = "INTERNAL_ERROR"
 
 
 class ServerResponse:
-    def __init__(self, response_code: str, message: str):
+    def __init__(self, response_code: str, message: str, username: str = None):
         """
         Initialize a ServerResponse object.
 
         :param response_code: string code of the result of the server's operation.
         :param message: A message providing additional information about the response.
+        :param username: The username of the user connected to the server. Should only be used in the login or register request.
         """
         self.response_code = response_code
         self.message = message if message else response_code
+        self.username = username
 
 
     def to_dict(self):
@@ -28,9 +30,16 @@ class ServerResponse:
 
             :return: A dictionary representation of the response.
             """
+            if self.username:
+                return {
+                    "status_code": self.response_code,
+                    "message": self.message,
+                    "username": self.username
+                }
+
             return {
                 "status_code": self.response_code,
-                "message": self.message
+                "message": self.message,
             }
 
 
@@ -41,7 +50,3 @@ class ServerResponse:
         :return: A JSON representation of the response.
         """
         return json.dumps(self.to_dict())
-    
-
-    def __str__(self):
-        return f"ServerResponse(status_code={self.response_code}, message={self.message})"

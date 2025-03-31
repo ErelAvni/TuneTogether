@@ -8,7 +8,7 @@ from server_response import ServerResponse
 
 class RegisterPage(Page):
     def __init__(self, parent, controller, connected_client: Client):
-        super().__init__(parent, controller, connected_client, bg_param="#95DBCD")
+        super().__init__(parent, controller, connected_client, bg_param="#95DBCD", show_logout_button=False)
 
         # Title Label
         self.title_label = tk.Label(self, text="REGISTER", font=self.title_font, bg="#95DBCD")

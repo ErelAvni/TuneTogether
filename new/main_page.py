@@ -1,7 +1,9 @@
 import tkinter as tk
+from PIL import Image, ImageTk
 from client_new import Client
 from tkinter import messagebox
 from page import Page
+import os
 
 class MainPage(Page):
     def __init__(self, parent, controller, connected_client: Client):
@@ -48,26 +50,19 @@ class MainPage(Page):
         title_label = tk.Label(box_frame, text=song_title, bg="#95DBCD", anchor="center")
         title_label.pack(pady=5)
 
+        # Load the play button image using Pillow
+        image_path = "new\\images\\play_icon.png"  # Relative path to the image
+        try:
+            play_image = Image.open(image_path)
+            play_image = play_image.resize((32, 32))  # Resize the image if needed
+            play_image_tk = ImageTk.PhotoImage(play_image)  # Convert to PhotoImage for Tkinter
+        except Exception as e:
+            print(f"Error loading image: {e}")
+            return  # Exit the function if the image cannot be loaded
+
         # Buttons
-        play_button = tk.Button(box_frame, text="Play", width=10)
-        play_button.pack(side=tk.RIGHT, padx=5, pady=5)
+        play_button = tk.Button(box_frame, width=32, height=32)
+        play_button.image = play_image_tk  # Keep a reference to the image to prevent garbage collection
+        play_button.pack(side=tk.RIGHT, padx=5, pady=5)  # Set the button size to match the image
         comment_button = tk.Button(box_frame, text="Comment", width=10)
         comment_button.pack(side=tk.LEFT, padx=5, pady=5)
-
-
-    def create_song_box(self, song_title, row, col):
-        # Create a frame for each box
-        print("Creating song box")
-        box_frame = tk.Frame(self, bg="#95DBCD", bd=1, relief=tk.SUNKEN)
-
-        box_frame.grid(row=row, column=col, padx=20, pady=20, sticky="nsew")
-
-        # Title Label
-        title_label = tk.Label(box_frame, text=song_title, bg="#95DBCD", anchor="center")
-        title_label.pack(pady=5)
-
-        # Buttons
-        play_button = tk.Button(box_frame, text="Play", width=10)
-        play_button.pack(side=tk.LEFT, padx=5, pady=5)
-        comment_button = tk.Button(box_frame, text="Comment", width=10)
-        comment_button.pack(side=tk.RIGHT, padx=5, pady=5)

@@ -10,6 +10,7 @@ class Client:
         self.host = host
         self.port = port
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.username = None #username of the connected user. if none, the client is not connected to any user
 
 
     def connect(self):
@@ -33,6 +34,10 @@ class Client:
             response_json = response_data.decode('utf-8')
             response_dict = json.loads(response_json)
             response = ServerResponse(response_dict['status_code'], response_dict['message'])
+            # If the response contains a username, update the instance variable
+            if 'username' in response_dict:
+                self.username = response_dict['username']
+                print(f"Connected user: {self.username}")
             return response
 
         except Exception as e:
@@ -40,14 +45,18 @@ class Client:
             return None
 
 
-    def close(self, username: str = None):
+    def close(self):
         """Close the client socket and disconnect from the server."""
-        if username: ## If username is provided, send a logout request, otherwise skip (means that the app is closing without a user thats logged in)
-            self.send_request(ServerRequest.create_logout_payload(username))
+        if self.username:  # If username is provided, send a logout request
+            self.send_request(ServerRequest.create_logout_payload(self.username))
         try:
             # Send a DISCONNECT request before closing the socket
             disconnect_request = ServerRequest("DISCONNECT", {})
-            self.send_request(disconnect_request)
+            response = self.send_request(disconnect_request)
+            if response:
+                print(f"Server response to DISCONNECT: {response.response_code} - {response.message}")
+            else:
+                print("No response received for DISCONNECT request.")
         except Exception as e:
             print(f"Error sending DISCONNECT request: {e}")
         finally:
