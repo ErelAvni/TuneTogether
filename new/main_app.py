@@ -30,6 +30,7 @@ class MainApp(tk.Tk):
 
         self.show_frame("LoginPage")
 
+
     def show_frame(self, page_name):
         frame = self.frames[page_name]
         frame.tkraise()

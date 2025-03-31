@@ -1,49 +1,73 @@
 import tkinter as tk
 from client_new import Client
-from page import Page
-import hashlib
-from server_request_new import ServerRequest
-from server_response import ServerResponse
 from tkinter import messagebox
+from page import Page
 
 class MainPage(Page):
     def __init__(self, parent, controller, connected_client: Client):
         super().__init__(parent, controller, connected_client, bg_param="#95DBCD")
+        self.create_grid()
 
 
     # Title Label
-        self.title_label = tk.Label(self, text="TUNE TOGETHER", font=self.title_font, bg="#95DBCD")
-        self.title_label.pack(pady=30)
-
-    
-    def _create_grid(self):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                index = i * self.cols + j
-                if index < len(self.song_list):
-                    song_title = self.song_list[index]
-                    self._create_box(i, j, song_title)
+        title_frame = tk.Frame(self, bg="#95DBCD")
+        title_frame.place(relx=0.5, rely=0.1, anchor="center")  # Center the title frame
+        title_frame.lift()  # Move the title frame to the front
+        title = tk.Label(title_frame, text="TuneTogether", font=("Arial", 50, "bold"), bg="#95DBCD")
+        title.pack()
 
 
-    def _create_box(self, row, col, song_title):
+    def create_grid(self):
+        # Create a grid layout for the song boxes
+        # Example song list
+        self.song_list = ["Song 1", "Song 2", "Song 3", "Song 4", "Song 5", "Song 6"]
+        
+        # Create a container frame to hold the grid
+        grid_frame = tk.Frame(self, bg="#95DBCD")
+        grid_frame.pack(padx=200, pady=200)  # Add padding to move the grid as a whole
+        grid_frame.lower()  # Move the grid frame to the back
+
+        # Grid configuration
+        rows = 2
+        cols = 3
+
+        for index, song_title in enumerate(self.song_list):
+            row = index // cols
+            col = index % cols
+            self.create_song_box_in_frame(grid_frame, song_title, row, col)
+
+
+    def create_song_box_in_frame(self, frame, song_title, row, col):
+        # Create a frame for each box inside the given frame
+        print("Creating song box in frame")
+        box_frame = tk.Frame(frame, bg="#95DBCD", bd=1, relief=tk.SUNKEN)
+
+        box_frame.grid(row=row, column=col, padx=20, pady=20, sticky="nsew")
+
+        # Title Label
+        title_label = tk.Label(box_frame, text=song_title, bg="#95DBCD", anchor="center")
+        title_label.pack(pady=5)
+
+        # Buttons
+        play_button = tk.Button(box_frame, text="Play", width=10)
+        play_button.pack(side=tk.RIGHT, padx=5, pady=5)
+        comment_button = tk.Button(box_frame, text="Comment", width=10)
+        comment_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+
+    def create_song_box(self, song_title, row, col):
         # Create a frame for each box
-        box_frame = tk.Frame(self, relief=tk.GROOVE, borderwidth=1)
-        box_frame.grid(row=row, column=col, padx=5, pady=5, sticky="nsew")
+        print("Creating song box")
+        box_frame = tk.Frame(self, bg="#95DBCD", bd=1, relief=tk.SUNKEN)
 
-        # Configure row and column weights for the box frame
-        box_frame.grid_rowconfigure(0, weight=1)  # For the title
-        box_frame.grid_rowconfigure(1, weight=1)  # For the buttons
-        box_frame.grid_columnconfigure(0, weight=1) # For the play button
-        box_frame.grid_columnconfigure(1, weight=1) # For the comment button
+        box_frame.grid(row=row, column=col, padx=20, pady=20, sticky="nsew")
 
-        # Title Label (top half)
-        title_label = tk.Label(box_frame, text=song_title, anchor="center", wraplength=150)
-        title_label.grid(row=0, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
+        # Title Label
+        title_label = tk.Label(box_frame, text=song_title, bg="#95DBCD", anchor="center")
+        title_label.pack(pady=5)
 
-        # Play Button (bottom-left)
-        play_button = tk.Button(box_frame, text="Play", command=lambda t=song_title: self._play_song(t))
-        play_button.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
-
-        # Comment Button (bottom-right)
-        comment_button = tk.Button(box_frame, text="Comment", command=lambda t=song_title: self._comment_song(t))
-        comment_button.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
+        # Buttons
+        play_button = tk.Button(box_frame, text="Play", width=10)
+        play_button.pack(side=tk.LEFT, padx=5, pady=5)
+        comment_button = tk.Button(box_frame, text="Comment", width=10)
+        comment_button.pack(side=tk.RIGHT, padx=5, pady=5)

@@ -40,33 +40,16 @@ class Client:
             return None
 
 
-    def close(self):
-        self.client_socket.close()
-        print("Connection closed.")
-
-
-if __name__ == "__main__":
-    client = Client()
-    try:
-        client.connect()
-        request_code = input("Enter your request code for the server: ")
-        if request_code == "LOGIN":
-            username = input("Enter your username: ")
-            password = input("Enter your password: ")
-            password_hash = sha256(password.encode('utf-8')).hexdigest()
-            request = ServerRequest.create_login_payload(username, password_hash)
-        elif request_code == "REGISTER":
-            username = input("Enter your username: ")
-            password = input("Enter your password: ")
-            password_hash = sha256(password.encode('utf-8')).hexdigest()
-            age = int(input("Enter your age: "))
-            request = ServerRequest.create_register_payload(username, password_hash, age)
-            print(request)
-        else:
-            print("Invalid request code. Please enter either 'LOGIN' or 'REGISTER'.")
-            raise ValueError("Invalid request code")        
-
-        print(client.send_request(request))  # Send the request to the server
-
-    finally:
-        client.close()  # Ensure the connection is closed
+    def close(self, username: str = None):
+        """Close the client socket and disconnect from the server."""
+        if username: ## If username is provided, send a logout request, otherwise skip (means that the app is closing without a user thats logged in)
+            self.send_request(ServerRequest.create_logout_payload(username))
+        try:
+            # Send a DISCONNECT request before closing the socket
+            disconnect_request = ServerRequest("DISCONNECT", {})
+            self.send_request(disconnect_request)
+        except Exception as e:
+            print(f"Error sending DISCONNECT request: {e}")
+        finally:
+            self.client_socket.close()
+            print("Connection closed.")

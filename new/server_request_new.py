@@ -6,13 +6,15 @@ REGISTER = "REGISTER"
 PLAY_SONG = "PLAY_SONG"
 STOP_SONG = "STOP_SONG"
 COMMENT = "COMMENT"
+LOGOUT = "LOGOUT"
+DISCONNECT = "DISCONNECT"
 
 class ServerRequest:
     """
     Represents a request sent by the client to the server.
     """
 
-    def __init__(self, request_code, payload=None):
+    def __init__(self, request_code, payload={}):
         """
         Initialize a ServerRequest instance.
 
@@ -41,6 +43,14 @@ class ServerRequest:
             "age": age
         }
         return ServerRequest(REGISTER, payload)
+    
+
+    @staticmethod
+    def create_logout_payload(username: str):
+        payload = {
+            "username": username
+        }
+        return ServerRequest(LOGOUT, payload)
     
 
     def to_dict(self):
