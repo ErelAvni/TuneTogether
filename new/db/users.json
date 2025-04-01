@@ -18,5 +18,10 @@
         "username": "testuser",
         "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
         "age": "18"
+    },
+    "nigga": {
+        "username": "nigga",
+        "password_hash": "08a841e996781e9e77d30a4e4420a8f501a280b00624e6d1224bf54aaff73eba",
+        "age": "100"
     }
 }

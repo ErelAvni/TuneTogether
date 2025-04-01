@@ -4,6 +4,18 @@ import json
 from server_request_new import ServerRequest, LOGIN, REGISTER, PLAY_SONG, STOP_SONG, COMMENT, LOGOUT, DISCONNECT
 import db.DButilites as DButilites
 from server_response import ServerResponse, OK, DATA_NOT_FOUND, UNAUTHORIZED, INVALID_REQUEST, INVALID_DATA, INTERNAL_ERROR
+import pygame
+from googleapiclient.discovery import build
+import os
+import yt_dlp
+from pydub import AudioSegment
+import dotenv
+dotenv.load_dotenv()
+
+
+YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
+YOUTUBE = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+FFPLAY_PATH = os.getenv("FFPLAY_PATH")
 
 
 class TuneTogetherServer:
@@ -162,6 +174,31 @@ class TuneTogetherServer:
                 self.connected_clients.remove(conn_socket)
             conn_socket.close()
             print("Client socket closed.")
+
+    
+    #-----------song playing methods-------------------
+
+
+    def search_song(self, query: str):
+        '''Search for a song on YouTube using the provided query.
+        :param query: The search query for the song.
+        :return: The URL of the first matching song to the search query.
+        '''
+        search_response = YOUTUBE.search().list(
+            q=query,                   # Search query (song name)
+            part="snippet",            # Request snippet data (title, ID, etc.)
+            type="video",              # Only look for videos (not channels/playlists)
+            videoCategoryId="10",      # Filter results to category 10 (Music)
+            maxResults=1               # Get only the top result
+        ).execute()
+
+        # Extract video ID from the API response
+        if search_response["items"]:
+            song_id = search_response["items"][0]["id"]["videoId"]
+            song_url = f"https://www.youtube.com/watch?v={song_id}"
+            return song_url
+        
+        return None  # Return None if no result found
 
 
 def main():
