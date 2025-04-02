@@ -4,18 +4,14 @@ import json
 from server_request_new import ServerRequest, LOGIN, REGISTER, PLAY_SONG, STOP_SONG, COMMENT, LOGOUT, DISCONNECT
 import db.DButilites as DButilites
 from server_response import ServerResponse, OK, DATA_NOT_FOUND, UNAUTHORIZED, INVALID_REQUEST, INVALID_DATA, INTERNAL_ERROR
-import pygame
 from googleapiclient.discovery import build
 import os
-import yt_dlp
-from pydub import AudioSegment
 import dotenv
 dotenv.load_dotenv()
 
 
 YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
 YOUTUBE = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
-FFPLAY_PATH = os.getenv("FFPLAY_PATH")
 
 
 class TuneTogetherServer:
@@ -181,7 +177,7 @@ class TuneTogetherServer:
 
     def search_song(self, query: str):
         '''Search for a song on YouTube using the provided query.
-        :param query: The search query for the song.
+        :param query: The search query for the song (should be the song's name).
         :return: The URL of the first matching song to the search query.
         '''
         search_response = YOUTUBE.search().list(
