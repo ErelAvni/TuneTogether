@@ -4,6 +4,7 @@ import os
 #CONSTS
 BASE_PATH = os.path.dirname(__file__)
 USER_DB_PATH = os.path.join(BASE_PATH, "users.json")
+SONG_PATHS_PATH = os.path.join(BASE_PATH, "song_paths.json")
 
 
 def load_data_from_json(full_path: str):

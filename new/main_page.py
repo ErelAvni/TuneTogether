@@ -33,7 +33,6 @@ class MainPage(Page):
         grid_frame.lower()  # Move the grid frame to the back
 
         # Grid configuration
-        rows = 2
         cols = 3
 
         for index, song_title in enumerate(self.song_list):
@@ -45,7 +44,7 @@ class MainPage(Page):
     def create_song_box_in_frame(self, frame, song_title, row, col):
         # Create a frame for each box inside the given frame
         print("Creating song box in frame")
-        box_frame = tk.Frame(frame, bg="#95DBCD", bd=1, relief=tk.SUNKEN)
+        box_frame = tk.Frame(frame, bg="#95DBCD", bd=1, relief=tk.RAISED)
 
         box_frame.grid(row=row, column=col, padx=20, pady=20, sticky="nsew")
 
@@ -99,7 +98,7 @@ class MainPage(Page):
             )
             button.image = stop_image_tk  # Keep a reference to prevent garbage collection
 
-            self.play_song()
+            #self.play_song()
 
 
         elif new_state == "play":
@@ -119,7 +118,7 @@ class MainPage(Page):
             )
             button.image = play_image_tk  # Keep a reference to prevent garbage collection
 
-            self.stop_song()
+            #self.stop_song()
 
 
     def stop_song(self):
@@ -131,3 +130,4 @@ class MainPage(Page):
         """Start the song playback."""
         print("Starting song playback...")
         self.connected_client.send_request(ServerRequest("PLAY", {}))
+
