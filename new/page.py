@@ -7,29 +7,43 @@ from abc import ABC, abstractmethod
 
 
 class Page(tk.Frame):
-    def __init__(self, parent, controller, connected_client: Client, username : str = None, bg_param="#95DBCD", show_logout_button: bool = True):
+    def __init__(self, parent, controller, connected_client: Client, bg_param="#95DBCD", show_top_bar: bool = True):
         super().__init__(parent, bg=bg_param)
         self.controller = controller
         self.connected_client = connected_client
+        self.username = self.connected_client.username
 
         # Custom Fonts
         self.title_font = ("Arial", 50, "bold")
         self.label_font = ("Arial", 20)
         self.button_font = ("Arial", 20)
 
-        self.logout_button(show_logout_button) # Create the logout button
+        # Create the top bar
+        if show_top_bar:
+            self.create_top_bar()
 
-    
-    def logout_button(self, show: bool):
+        # Create a content frame for page-specific content
+        self.content_frame = tk.Frame(self, bg=bg_param)
+        self.content_frame.place(relx=0, rely=0.1, relwidth=1, relheight=0.9)  # Positioned below the top bar
+
+
+    def create_top_bar(self, username: str = None):
         """
-        Create a logout button that allows the user to log out of the application.
+        Create a top bar that contains the username and logout button.
         """
-        if not show:
-            return
-        logout_button_frame = tk.Frame(self, bg="#95DBCD")
-        logout_button_frame.place(relx=1.0, rely=0.0, anchor="ne", x=-10, y=10)  # Positioned in the top-right corner with padding
-        logout_button = tk.Button(logout_button_frame, text="Logout", font=self.button_font, command= lambda: self.logout())
-        logout_button.pack(pady=5, padx=5)  # Add padding to the button
+        # Create the top bar frame
+        top_bar = tk.Frame(self, bg="#4CAF50", height=50)  # Green background for the bar
+        top_bar.place(relx=0, rely=0, relwidth=1)  # Position it at the top, spanning the full width
+
+        # Display the username
+        username_label = tk.Label(top_bar, text=f"Logged in as: {username}",
+                                font=self.label_font, bg="#4CAF50", fg="white", anchor="w")
+        username_label.pack(side=tk.LEFT, padx=10, pady=10)
+
+        # Add the logout button
+        logout_button = tk.Button(top_bar, text="Logout", font=self.button_font, bg="#F44336", fg="white",
+                                command=self.logout)
+        logout_button.pack(side=tk.RIGHT, padx=10, pady=5)
 
 
     def logout(self):
@@ -39,11 +53,20 @@ class Page(tk.Frame):
         # Perform any necessary cleanup or state reset here
         print(f"Logging out user: {self.connected_client.username}")
         if self.connected_client.username:
-            print(f"Logging out user: {self.connected_client.username}")
             self.connected_client.send_request(ServerRequest.create_logout_payload(self.connected_client.username))
         else:
             print("No user logged in.")
-        self.controller.show_frame("LoginPage")  # Show the login page again
+        self.controller.show_frame("LoginPage")  # Show the login page again    
+
+
+    def logout_button(self):
+        """
+        Create a logout button that allows the user to log out of the application.
+        """
+        logout_button_frame = tk.Frame(self, bg="#95DBCD")
+        logout_button_frame.place(relx=1.0, rely=0.0, anchor="ne", x=-10, y=10)  # Positioned in the top-right corner with padding
+        logout_button = tk.Button(logout_button_frame, text="Logout", font=self.button_font, command= lambda: self.logout())
+        logout_button.pack(pady=5, padx=5)  # Add padding to the button
 
 
     @abstractmethod

@@ -1,4 +1,5 @@
 import json
+from song import Song
 
 # Request codes
 LOGIN = "LOGIN"

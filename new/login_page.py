@@ -9,7 +9,7 @@ from tkinter import messagebox
 
 class LoginPage(Page):
     def __init__(self, parent, controller, connected_client: Client):
-        super().__init__(parent, controller, connected_client, bg_param="#95DBCD", show_logout_button=False)
+        super().__init__(parent, controller, connected_client, bg_param="#95DBCD", show_top_bar=False)
 
         # Custom Fonts
         self.title_font = ("Arial", 50, "bold")

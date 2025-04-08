@@ -9,7 +9,8 @@ class MainApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("TuneTogether")
-        self.geometry("1400x800")
+        self.geometry("1200x700")
+        self.resizable(False, False)
         self.frames = {}
 
         # Create a Client instance
@@ -21,19 +22,26 @@ class MainApp(tk.Tk):
             print(f"Failed to connect to server: {e}")
             return
 
-        # Initialize frames
-        for F in (LoginPage, RegisterPage, MainPage):
-            page_name = F.__name__
-            frame = F(parent=self, controller=self, connected_client=self.client)
-            self.frames[page_name] = frame
-            frame.place(relwidth=1, relheight=1)
-
         self.show_frame("LoginPage")
 
 
     def show_frame(self, page_name):
-        frame = self.frames[page_name]
-        frame.tkraise()
+        # Destroy the current page if it exists
+        for frame in self.frames.values():
+            frame.destroy()
+
+        else:
+            if page_name == "MainPage":
+                frame = MainPage(parent=self, controller=self, connected_client=self.client)
+            elif page_name == "RegisterPage":
+                frame = RegisterPage(parent=self, controller=self, connected_client=self.client)
+            elif page_name == "LoginPage":
+                frame = LoginPage(parent=self, controller=self, connected_client=self.client)
+            else:
+                raise ValueError(f"Unknown page name: {page_name}")
+            
+            self.frames[page_name] = frame
+            frame.place(relwidth=1, relheight=1)
 
 
     def on_close(self):
