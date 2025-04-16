@@ -160,7 +160,7 @@ class MainPage(Page):
         self.song_boxes[song] = box_frame
 
         # Comment Button
-        comment_button = tk.Button(box_frame, text="Comment", width=10)
+        comment_button = tk.Button(box_frame, text="Comment", width=10, command=lambda: self.controller.show_frame("CommentPage", song_name=song.song_name))
         comment_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
 

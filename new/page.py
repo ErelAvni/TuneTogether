@@ -32,16 +32,16 @@ class Page(tk.Frame):
         Create a top bar that contains the username and logout button.
         """
         # Create the top bar frame
-        top_bar = tk.Frame(self, bg="#4CAF50", height=50)  # Green background for the bar
-        top_bar.place(relx=0, rely=0, relwidth=1)  # Position it at the top, spanning the full width
+        self.top_bar = tk.Frame(self, bg="#4CAF50", height=50)  # Green background for the bar
+        self.top_bar.place(relx=0, rely=0, relwidth=1)  # Position it at the top, spanning the full width
 
         # Display the username
-        username_label = tk.Label(top_bar, text=f"Logged in as: {username}",
+        username_label = tk.Label(self.top_bar, text=f"Logged in as: {username}",
                                 font=self.label_font, bg="#4CAF50", fg="white", anchor="w")
         username_label.pack(side=tk.LEFT, padx=10, pady=10)
 
         # Add the logout button
-        logout_button = tk.Button(top_bar, text="Logout", font=self.button_font, bg="#F44336", fg="white",
+        logout_button = tk.Button(self.top_bar, text="Logout", font=self.button_font, bg="#F44336", fg="white",
                                 command=self.logout)
         logout_button.pack(side=tk.RIGHT, padx=10, pady=5)
 

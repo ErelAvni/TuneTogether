@@ -5,17 +5,23 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import requests
 from PIL import Image
 from io import BytesIO
+from comment import Comment
+from datetime import datetime
 import json
 import os
+from urllib.parse import urlparse, parse_qs
+from googleapiclient.discovery import build
 import dotenv
 dotenv.load_dotenv()
 
 CLIENT_ID = os.environ.get('SPOTIFY_CLIENT_ID')
 CLIENT_SECRET = os.environ.get('SPOTIFY_CLIENT_SECRET')
+YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
 
 
 # Authenticate using Client Credentials Flow
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
+youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
 
 class Song:
@@ -49,6 +55,8 @@ class Song:
         '''Gets info on a song by its name using the Spotify API.
         :Returns: tuple of the artist and the song image URL'''
         query = self.song_name
+        if self.song_name == "bohemian rhapsody":
+            query = "Bohemian Rhapsody" + " Queen"
         results = sp.search(q=query, type="track", limit=1)
 
         if results["tracks"]["items"]:
@@ -75,7 +83,69 @@ class Song:
         img_data = Image.open(BytesIO(response.content))  # Convert to Image
         img_data = img_data.resize((100, 100), Image.Resampling.LANCZOS)  # Resize for button
         return img_data
+    
 
+    def get_youtube_URL(self, query: str = None):
+        '''Search for a song on YouTube using the provided query.
+        :param query: The search query for the song (should be the song's name).
+        :return: The URL of the first matching song to the search query.
+        '''
+        if query is None:
+            query = self.song_name
+        search_response = youtube.search().list(
+            q=query,                   # Search query (song name)
+            part="snippet",            # Request snippet data (title, ID, etc.)
+            type="video",              # Only look for videos (not channels/playlists)
+            videoCategoryId="10",      # Filter results to category 10 (Music)
+            maxResults=1               # Get only the top result
+        ).execute()
+
+        # Extract video ID from the API response
+        if search_response["items"]:
+            song_id = search_response["items"][0]["id"]["videoId"]
+            song_url = f"https://www.youtube.com/watch?v={song_id}"
+            return song_url
+        
+        return None  # Return None if no result found
+
+
+    def get_comments_by_url(self, max_results: int = 20):
+        # Extract video ID from URL
+        url = self.get_youtube_URL()
+        query = urlparse(url).query
+        video_id = parse_qs(query).get("v")
+        if not video_id:
+            raise ValueError("Invalid YouTube URL or missing video ID.")
+        video_id = video_id[0]
+
+        # Call commentThreads endpoint
+        request = youtube.commentThreads().list(
+            part="snippet",
+            videoId=video_id,
+            maxResults=max_results,
+            textFormat="plainText"
+        )
+        try:     
+            response = request.execute()
+
+            comments = []
+            for item in response.get("items", []):
+                top_comment = item["snippet"]["topLevelComment"]["snippet"]
+                timestamp = datetime.fromisoformat(top_comment["publishedAt"].replace("Z", ""))
+                commnet = Comment(
+                    username = top_comment["authorDisplayName"],
+                    content = top_comment["textDisplay"],
+                    timestamp = timestamp
+                    
+                )
+                comments.append(commnet)
+
+            return comments
+        
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+    
 
     def to_dict(self):
         '''Returns a dictionary representation of the song object.
@@ -92,3 +162,11 @@ class Song:
         '''Returns a JSON representation of the song object.
         :return: a JSON string with the song name, artist, and album cover'''
         return json.dumps(self.to_dict())
+    
+
+if __name__ == "__main__":
+    # Example usage
+    song = Song("Bohemian Raphsody")
+    print(song.to_dict())
+    print(song.get_youtube_URL())
+    print(song.get_comments_by_url())
