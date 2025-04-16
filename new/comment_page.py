@@ -4,14 +4,17 @@ from client_new import Client
 from comment import Comment
 from song import Song
 import db.DButilites
+from tkinter import messagebox
 
 class CommentPage(Page):
     def __init__(self, parent, controller, connected_client: Client, song_name: str):
         super().__init__(parent, controller, connected_client, bg_param="#95DBCD")
-        super().create_top_bar(connected_client.username)  # Create the top bar with username
+        super().create_top_bar(connected_client.username, song_name)  # Create the top bar with username
         
         all_comments = db.DButilites.load_data_from_json(db.DButilites.COMMENTS_PATH)
+        print("all comments: ", all_comments)
         song_comments = all_comments[song_name]
+        self.song_name = song_name
 
         # Title Label
         title_frame = tk.Frame(self, bg="#95DBCD")
@@ -60,8 +63,19 @@ class CommentPage(Page):
 
         tk.Label(add_frame, text="add comment", bg="white").pack()
         tk.Label(add_frame, text="comment data", bg="white").pack()
-        tk.Text(add_frame, height=6, width=30, bg="#d3d3d3").pack(pady=5)
-        tk.Button(add_frame, text="COMMENT", bg="#4b9c97", fg="white").pack()
+
+        # Create the Text widget and store a reference to it
+        comment_text_widget = tk.Text(add_frame, height=6, width=30, bg="#d3d3d3")
+        comment_text_widget.pack(pady=5)
+
+        # Pass the Text widget to the button's command
+        tk.Button(
+            add_frame,
+            text="COMMENT",
+            bg="#4b9c97",
+            fg="white",
+            command=lambda: self.add_comment(comment_text_widget)
+        ).pack()
 
         # RIGHT: TuneTogether comments
         tt_frame = tk.Frame(self.content_frame, bg="white", bd=1, relief='solid')
@@ -89,3 +103,25 @@ class CommentPage(Page):
 
         # Global mouse scroll binding
         self.controller.bind_all("<MouseWheel>", lambda e: active_canvas["canvas"].yview_scroll(-1 * int(e.delta / 120), "units") if active_canvas["canvas"] else None)
+
+
+    def add_comment(self, comment_text_widget: tk.Text):
+        '''Adds a comment with the given data to the database and sends it to the server. Not responsible for 
+        displaying the comment. For that, user needs to refresh the page.'''
+        comment_text = comment_text_widget.get("1.0", tk.END).strip()
+
+        if not comment_text:
+            messagebox.showerror("Error", "Comment cannot be empty.")
+            return
+
+        comment = Comment(
+            username=self.connected_client.username,
+            content=comment_text
+        )
+        all_comments = db.DButilites.load_data_from_json(db.DButilites.COMMENTS_PATH)
+        song_comments = all_comments[self.song_name]
+        song_comments.append(comment.to_dict())
+        db.DButilites.update_data_to_json(all_comments, db.DButilites.COMMENTS_PATH, manual_update=True)
+
+        # Clear the Text widget
+        comment_text_widget.delete("1.0", tk.END)

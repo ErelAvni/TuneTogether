@@ -20,20 +20,26 @@ def load_data_from_json(full_path: str):
     return data
 
 
-def update_data_to_json(data: dict, full_path: str):
+def update_data_to_json(data: dict, full_path: str, manual_update: bool = False):
     """
     Updates the data in the file at the given path.
     If the file does not exist, it will not update anything.
     Expecting the data to be a dictionary with a key 'username' that is unique.
+    if manual_update is True, it will not add the data to the file, but will just write it as is.
+    this means that if manual_update is True, the data should be a dictionary with the same structure as the file.
     """
+    if not manual_update:
+        data_key = data['username']
+        file_data = load_data_from_json(full_path)
+        file_data[data_key] = data
+
+    else: 
+        file_data = data
+
     if not os.path.exists(full_path):
         print("The file does not exist. Not updating anything.")
         return False
     
-    data_key = data['username']
-    file_data = load_data_from_json(full_path)
-    file_data[data_key] = data
-
     try:
         with open(full_path, 'w') as file:
             json.dump(file_data, file, indent=4)

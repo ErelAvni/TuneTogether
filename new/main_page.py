@@ -48,8 +48,8 @@ class MainPage(Page):
         try:
             self.song_dict = {
                 "Comfortably Numb" : Song("Comfortably Numb"),
-                "Bllie Jean" : Song("Bllie Jean"),
-                "Bohemian_Raphsody" : Song("Bohemian Raphsody"),
+                "Billie Jean" : Song("Billie Jean"),
+                "Echoes" : Song("Echoes"),
                 "Call Me Maybe" : Song("Call Me Maybe"),
                 "Bring Me To Life" : Song("Bring Me To Life"),
                 "Lose Yourself" : Song("Lose Yourself"),
@@ -58,7 +58,6 @@ class MainPage(Page):
                 "Superstition" : Song("Superstition"),
                 "Three Little Birds" : Song("Three Little Birds"),   
             }
-            
             # --- Canvas dimensions (smaller than window) ---
             canvas_width = 850
             canvas_height = 400

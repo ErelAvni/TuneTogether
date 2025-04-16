@@ -27,7 +27,24 @@ class Page(tk.Frame):
         self.content_frame.place(relx=0, rely=0.1, relwidth=1, relheight=0.9)  # Positioned below the top bar
 
 
-    def create_top_bar(self, username: str = None):
+    def refresh_page(self, song_name: str):
+        """Refresh the current page by reinitializing it."""
+        # Get the current page class
+        page_class = self.__class__
+        # Destroy the current frame
+        self.destroy()
+        # Recreate the page
+        print(page_class.__name__)
+        print(song_name)
+        if page_class.__name__ == "CommentPage" and song_name is not None:
+            new_page = page_class(self.master, self.controller, self.connected_client, song_name=song_name)
+        else:
+            new_page = page_class(self.master, self.controller, self.connected_client)
+        new_page.pack(fill="both", expand=True)
+        self.controller.frames[page_class.__name__] = new_page
+
+
+    def create_top_bar(self, username: str = None, song_name : str = None):
         """
         Create a top bar that contains the username and logout button.
         """
@@ -44,6 +61,16 @@ class Page(tk.Frame):
         logout_button = tk.Button(self.top_bar, text="Logout", font=self.button_font, bg="#F44336", fg="white",
                                 command=self.logout)
         logout_button.pack(side=tk.RIGHT, padx=10, pady=5)
+
+        # Add a refresh button to the top bar
+        refresh_button = tk.Button(
+            self.top_bar,
+            text="Refresh",
+            bg="#4CAF50",
+            fg="white",
+            command=lambda:self.refresh_page(song_name=song_name)  # Pass the song name to refresh_page
+        )
+        refresh_button.pack(side="right", padx=10, pady=5)
 
 
     def logout(self):
