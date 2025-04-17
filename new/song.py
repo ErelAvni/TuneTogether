@@ -29,7 +29,6 @@ class Song:
         '''Initializes a song object. Will work only for songs that are in the database.
         :param song_name: the name of the song. Needs to be in \"Some Song Name\" format.
         '''
-        print("entered init with song: ", song_name)
         self.song_name = song_name
         
         song_paths_dict = DButilities.load_data_from_json(DButilities.SONG_PATHS_PATH)
@@ -41,7 +40,6 @@ class Song:
 
         self.artist = None
         self.album_cover = None
-        print("past song_paths_dict with song: ", self.song_name)
         song_info = self.get_song_info()
         if song_info:
             self.artist = song_info[0]
@@ -65,10 +63,8 @@ class Song:
             song_length = track["duration_ms"] * 0.001  # Convert milliseconds to seconds
             song_length = int(song_length)  # Convert to integer seconds
             song_length = f"{song_length // 60}:{song_length % 60:02d}" 
-            print("past good results with song: ", self.song_name)
         
         else:
-            print(f"Song {self.song_name} not found in Spotify.")
             return None, None
         
         return [artist_name, album_cover, song_length]
@@ -163,11 +159,3 @@ class Song:
         '''Returns a JSON representation of the song object.
         :return: a JSON string with the song name, artist, and album cover'''
         return json.dumps(self.to_dict())
-    
-
-if __name__ == "__main__":
-    # Example usage
-    song = Song("Bohemian Raphsody")
-    print(song.to_dict())
-    print(song.get_youtube_URL())
-    print(song.get_comments_by_url())

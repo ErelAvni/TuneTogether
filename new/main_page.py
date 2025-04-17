@@ -6,8 +6,6 @@ from page import Page
 import pygame
 from song import Song
 import os
-from server_request_new import ServerRequest
-from server_response import ServerResponse
 
 
 class MainPage(Page):
@@ -85,7 +83,6 @@ class MainPage(Page):
             for index, song in enumerate(self.song_dict.values()):
                 row = index // cols
                 col = index % cols
-                print(f"Creating song box for row {row}, col {col}, song: {song.song_name}")
                 self.create_song_box_in_frame(grid_frame, song, row, col)
 
             grid_frame.bind("<Configure>", self.on_frame_configure)
@@ -98,7 +95,6 @@ class MainPage(Page):
 
     def create_song_box_in_frame(self, frame, song : Song, row, col):
         # Create a frame for each box inside the given frame
-        print("Creating song box in frame")
         box_frame = tk.Frame(frame, bg="#95DBCD", bd=1, relief=tk.RAISED, width=100, height=50)
 
         # Prevent the frame from resizing to fit its children

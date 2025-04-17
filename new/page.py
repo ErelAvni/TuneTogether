@@ -34,8 +34,7 @@ class Page(tk.Frame):
         # Destroy the current frame
         self.destroy()
         # Recreate the page
-        print(page_class.__name__)
-        print(song_name)
+        messagebox.showinfo("Success", f"Reloading {page_class.__name__}...")
         if page_class.__name__ == "CommentPage" and song_name is not None:
             new_page = page_class(self.master, self.controller, self.connected_client, song_name=song_name)
         else:

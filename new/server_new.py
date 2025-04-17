@@ -1,12 +1,15 @@
 import socket
 import threading
 import json
-from server_request_new import ServerRequest, LOGIN, REGISTER, PLAY_SONG, STOP_SONG, COMMENT, LOGOUT, DISCONNECT
+from server_request_new import ServerRequest, LOGIN, REGISTER, LOGOUT, DISCONNECT
 import db.DButilites as DButilites
 from server_response import ServerResponse, OK, DATA_NOT_FOUND, UNAUTHORIZED, INVALID_REQUEST, INVALID_DATA, INTERNAL_ERROR
 from googleapiclient.discovery import build
 import os
-from song import Song
+import socket, threading, json
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.fernet import Fernet
 import dotenv
 dotenv.load_dotenv()
 
@@ -38,15 +41,41 @@ class TuneTogetherServer:
         with conn_socket:
             print(f"Connected by {addr}")
             self.connected_clients.append(conn_socket)
+
+            # Step 1: Generate RSA key pair
+            private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+            public_key = private_key.public_key()
+
+            # Step 2: Send the public key to the client
+            public_pem = public_key.public_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PublicFormat.SubjectPublicKeyInfo
+            )
+            conn_socket.send(public_pem)  # send to client
+
+            # Step 3: Receive the encrypted Fernet key from the client
+            encrypted_fernet_key = conn_socket.recv(512)
+            fernet_key = private_key.decrypt(
+                encrypted_fernet_key,
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None
+                )
+            )
+            fernet = Fernet(fernet_key)
+            print("Secure Fernet key established.")
+
             while True:
                 try:
-                    data = conn_socket.recv(1024)
+                    data = conn_socket.recv(2048)
                     if not data:
                         break
-                    request_json = data.decode('utf-8')
+                    # Decrypt the received data using Fernet
+                    decrypted_data = fernet.decrypt(data)
+                    request_json = decrypted_data.decode('utf-8')
                     request_dict = json.loads(request_json)
                     request = ServerRequest(request_dict['request_code'], request_dict['payload'])
-                    print(f"Received request from {addr}: {request}")
                     # Process the ServerRequest here
                     request = ServerRequest(request_dict['request_code'], request_dict['payload'])
 
@@ -69,8 +98,9 @@ class TuneTogetherServer:
                         response_json = response.to_json()
 
                     
-                    print("response sending: ", response_json)
-                    conn_socket.send(response_json.encode('utf-8'))
+                    # Encrypt the response using Fernet
+                    encrypted_response = fernet.encrypt(response_json.encode('utf-8'))
+                    conn_socket.send(encrypted_response)
 
                 except Exception as e:
                     print(f"Error handling request from {addr}: {e}")

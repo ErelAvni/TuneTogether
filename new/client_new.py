@@ -1,8 +1,10 @@
 import socket
 from server_request_new import ServerRequest
 import json
-from hashlib import sha256
 from server_response import ServerResponse
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.fernet import Fernet
 
 
 class Client:
@@ -17,6 +19,27 @@ class Client:
         try:
             self.client_socket.connect((self.host, self.port))
             print(f"Connected to server at {self.host}:{self.port}")
+
+            # Step 1: Receive server public key
+            public_pem = self.client_socket.recv(1024)
+            public_key = serialization.load_pem_public_key(public_pem)
+
+            # Step 2: Generate Fernet key and encrypt it
+            self.fernet_key = Fernet.generate_key()
+            encrypted_fernet_key = public_key.encrypt(
+                self.fernet_key,
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None
+                )
+            )
+
+            # Step 3: Send encrypted Fernet key to server
+            self.client_socket.send(encrypted_fernet_key)
+            self.fernet = Fernet(self.fernet_key)
+            print("Secure Fernet key established.")
+
         except Exception as e:
             print(f"Failed to connect to server: {e}")
 
@@ -25,13 +48,14 @@ class Client:
         try:
             # Send the request to the server
             request_json = request.to_json()
-            self.client_socket.send(request_json.encode('utf-8'))
-            print(f"Sent request: {request_json}")
+            byte_request = request_json.encode('utf-8')
+            encrypted_request = self.fernet.encrypt(byte_request)
+            self.client_socket.send(encrypted_request)
 
             # Wait for the server's response
-            response_data = self.client_socket.recv(1024)
-            print(f"Received response: {response_data}")
-            response_json = response_data.decode('utf-8')
+            encrypted_response = self.client_socket.recv(2048)
+            byte_response = self.fernet.decrypt(encrypted_response)
+            response_json = byte_response.decode('utf-8')
             response_dict = json.loads(response_json)
             response = ServerResponse(response_dict['status_code'], response_dict['message'])
             # If the response contains a username, update the instance variable
@@ -61,4 +85,3 @@ class Client:
             print(f"Error sending DISCONNECT request: {e}")
         finally:
             self.client_socket.close()
-            print("Connection closed.")
