@@ -12,7 +12,10 @@ class MainPage(Page):
     def __init__(self, parent, controller, connected_client: Client):
         super().__init__(parent, controller, connected_client, bg_param="#95DBCD")
         super().create_top_bar(connected_client.username)  # Create the top bar with username
-        self.mixer = pygame.mixer.music
+        self.mixer = pygame.mixer  # Use pygame's mixer for audio playback
+        self.mixer.init()  # Initialize the mixer
+        self.mixer_music = self.mixer.music
+        self.current_loaded_song = None  # Track the currently loaded song
         self.song_boxes = {}  # song_name: song_box_frame mapping
         self.create_grid()
 
@@ -144,8 +147,13 @@ class MainPage(Page):
             activebackground="#95DBCD",
             command=lambda: self.song_button(box_frame, song)  # Pass the button and state
         )
+
         play_button.image = play_image_tk  # Keep a reference to prevent garbage collection
         play_button.pack(side=tk.LEFT, padx=5, pady=(5, 8))
+
+
+        # pause error message when play button is pressed before song is played:"pygame.error: mixer not initialized"
+                
 
         # Store the play button and state in the frame
         box_frame.play_button = play_button
@@ -181,7 +189,7 @@ class MainPage(Page):
         """Handle the play/stop functionality for a song."""
         if box_frame.is_playing:
             # Stop the song
-            self.stop_song(song)
+            self.pause_song(song)
             self.update_button_to_play(box_frame)
             box_frame.is_playing = False
         else:
@@ -218,12 +226,24 @@ class MainPage(Page):
     def play_song(self, song: Song):
         """Start the song playback."""
         try:
-            pygame.mixer.init()  # Initialize the mixer if not already done
-            print(os.path.exists(song.song_audio_file_path))
-            pygame.mixer.music.load(song.song_audio_file_path)  # Load the song file
-            pygame.mixer_music.play()
             print(f"Playing song: {song.song_name}")
-        
+            if self.current_loaded_song == None or song != self.current_loaded_song:
+                #print(f"from play_song - current_loaded_song: {self.current_loaded_song.song_name}")
+                print("Starting new song playback.")
+                self.mixer_music.load(song.song_audio_file_path)  # Load the song
+                self.mixer_music.play()
+                self.current_loaded_song = song  # Update the currently loaded song
+
+            elif song == self.current_loaded_song:
+                # If the same song is already loaded, just resume playback
+                print(f"from play_song - current_loaded_song: {self.current_loaded_song.song_name}")
+                print("Resuming song playback.")
+                self.mixer_music.unpause()
+                
+        except pygame.error as e:
+            print(f"Pygame error playing song: {e}")
+            messagebox.showerror("Playback Error", f"Could not play the song: {e}")
+
         except Exception as e:
             print(f"Error playing song: {e}")
             messagebox.showerror("Playback Error", f"Could not play the song: {e}")
@@ -247,12 +267,18 @@ class MainPage(Page):
         box_frame.play_button.image = stop_image_tk  # Keep a reference to prevent garbage collection
 
 
-    def stop_song(self, song: Song):
+    def pause_song(self, song: Song):
         """Stop the song playback."""
+        if self.current_loaded_song != song:
+            print("No song is currently loaded.")
+            return
         try:
-            pygame.mixer.init()
-            pygame.mixer.music.stop()  # Stop the music
+            self.mixer_music.pause()  # Stop the mixer
+            print(f"from pause_song - current_loaded_song: {self.current_loaded_song.song_name}")
             print(f"Stopped song: {song.song_name}")
+        except pygame.error as e:
+            print(f"Error stopping song: {e}")
+            messagebox.showerror("Playback Error", f"Could not stop the song: {e}")
         except Exception as e:
             print(f"Error stopping song: {e}")
             messagebox.showerror("Playback Error", f"Could not stop the song: {e}")
@@ -271,8 +297,8 @@ class MainPage(Page):
         Stop the mixer and clean up resources when the page is destroyed.
         """
         try:
-            if self.mixer.get_busy():  # Check if the mixer is playing
-                self.mixer.stop()  # Stop the mixer
+            if self.mixer_music.get_busy():  # Check if the mixer is playing
+                self.mixer_music.stop()  # Stop the mixer
             print("Mixer stopped.")
         except Exception as e:
             print(f"Error stopping mixer: {e}")

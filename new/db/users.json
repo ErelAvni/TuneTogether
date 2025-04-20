@@ -28,5 +28,15 @@
         "username": "user",
         "password_hash": "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb",
         "age": "21"
+    },
+    "ron": {
+        "username": "ron",
+        "password_hash": "32801f5c6ca59882d004c3b927de38fa22fa1ed71e0f63d66707f000f2587eac",
+        "age": "17"
+    },
+    "shalev": {
+        "username": "shalev",
+        "password_hash": "32801f5c6ca59882d004c3b927de38fa22fa1ed71e0f63d66707f000f2587eac",
+        "age": "17.9"
     }
 }
