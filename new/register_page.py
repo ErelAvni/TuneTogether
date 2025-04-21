@@ -54,7 +54,6 @@ class RegisterPage(Page):
 
     def register(self, username: str, password: str, age: int):
         '''Sends a register request to the server'''
-        print(f"username: {username}, password: {password}, age: {age}")
         if username == "" or password == "" or age == "":
             messagebox.showerror("Error", "Please fill in all fields.")
             return

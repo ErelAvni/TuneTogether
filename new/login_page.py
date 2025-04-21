@@ -49,7 +49,6 @@ class LoginPage(Page):
 
     def login(self, username: str, password: str):
         '''Sends a login request to the server'''
-        print(f"username: {username}, password: {password}")
         password_hash = self.hash_password(password)
         request = ServerRequest.create_login_payload(username, password_hash)
         response = self.connected_client.send_request(request)

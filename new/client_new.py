@@ -51,10 +51,11 @@ class Client:
             byte_request = request_json.encode('utf-8')
             encrypted_request = self.fernet.encrypt(byte_request)
             self.client_socket.send(encrypted_request)
-
+            print("past line 54 for request code: ", request.request_code)
             # Wait for the server's response
             encrypted_response = self.client_socket.recv(2048)
             byte_response = self.fernet.decrypt(encrypted_response)
+            print("past line 58 for request code: ", request.request_code)
             response_json = byte_response.decode('utf-8')
             response_dict = json.loads(response_json)
             response = ServerResponse(response_dict['status_code'], response_dict['message'])
@@ -85,3 +86,4 @@ class Client:
             print(f"Error sending DISCONNECT request: {e}")
         finally:
             self.client_socket.close()
+

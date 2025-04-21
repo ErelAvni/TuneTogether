@@ -1,14 +1,13 @@
 import json
-from song import Song
+from comment import Comment
 
 # Request codes
 LOGIN = "LOGIN"
 REGISTER = "REGISTER"
-PLAY_SONG = "PLAY_SONG"
-STOP_SONG = "STOP_SONG"
-COMMENT = "COMMENT"
 LOGOUT = "LOGOUT"
 DISCONNECT = "DISCONNECT"
+LIVE_CHAT_MESSAGE = "LIVE_CHAT_MESSAGE"
+GET_LIVE_CHAT_MESSAGES = "GET_LIVE_CHAT_MESSAGES"
 
 class ServerRequest:
     """
@@ -53,7 +52,7 @@ class ServerRequest:
         }
         return ServerRequest(LOGOUT, payload)
     
-
+    
     def to_dict(self):
         """
         Convert the request to a dictionary for serialization.

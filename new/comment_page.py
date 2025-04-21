@@ -93,7 +93,6 @@ class CommentPage(Page):
         for comment_dict in song_comments:
             comment = Comment.from_dict(comment_dict)
             text = comment.__repr__()
-            print(text)
             tk.Label(tt_inner, text=text, bg="#d3d3d3", anchor="w", justify="left", wraplength=180).pack(fill="x", padx=5, pady=3)
 
         tt_inner.bind("<Configure>", lambda e: tt_canvas.configure(scrollregion=tt_canvas.bbox("all")))

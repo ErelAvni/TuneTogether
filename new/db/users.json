@@ -38,5 +38,15 @@
         "username": "shalev",
         "password_hash": "32801f5c6ca59882d004c3b927de38fa22fa1ed71e0f63d66707f000f2587eac",
         "age": "17.9"
+    },
+    "Itay": {
+        "username": "Itay",
+        "password_hash": "1739b267e8d064848099791a1e1da5423564e586d23a6057879df0b768af61c8",
+        "age": "17"
+    },
+    "Yuval": {
+        "username": "Yuval",
+        "password_hash": "acc539b5c96544fe89f57530fd17376553e2ea45f49ae83f686296c47de3b443",
+        "age": "26"
     }
 }

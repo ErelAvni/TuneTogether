@@ -27,6 +27,10 @@ class MainPage(Page):
         title = tk.Label(title_frame, text="TuneTogether", font=("Arial", 50, "bold"), bg="#95DBCD")
         title.pack()
 
+        # live chat button
+        live_chat_button = tk.Button(self.top_bar, text="Live Chat", font=("Arial", 20), bg="#4CAF50", fg="white", command=lambda:self.controller.show_frame("LiveChatPage"))
+        live_chat_button.pack(side=tk.RIGHT, padx=10, pady=5)  # Add padding to the button
+
 
     def on_frame_configure(self, event):
         grid_canvas.configure(scrollregion=grid_canvas.bbox("all"))

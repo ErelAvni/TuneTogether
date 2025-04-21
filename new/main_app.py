@@ -4,6 +4,7 @@ from login_page import LoginPage
 from register_page import RegisterPage
 from main_page import MainPage
 from comment_page import CommentPage
+from live_chat_page import LiveChatPage
 from tkinter import messagebox
 
 
@@ -47,6 +48,9 @@ class MainApp(tk.Tk):
                 else:
                     messagebox.showinfo("Sucsess", f"Loading {page_name}...")
                     frame = CommentPage(parent=self, controller=self, connected_client=self.client, song_name=song_name)
+            elif page_name == "LiveChatPage":
+                messagebox.showinfo("Sucsess", f"Loading {page_name}...")
+                frame = LiveChatPage(parent=self, controller=self, connected_client=self.client)
             else:
                 raise ValueError(f"Unknown page name: {page_name}")
             

@@ -1,9 +1,10 @@
 import socket
 import threading
 import json
-from server_request_new import ServerRequest, LOGIN, REGISTER, LOGOUT, DISCONNECT
+from server_request_new import ServerRequest, LOGIN, REGISTER, LOGOUT, DISCONNECT, GET_LIVE_CHAT_MESSAGES, LIVE_CHAT_MESSAGE
 import db.DButilites as DButilites
 from server_response import ServerResponse, OK, DATA_NOT_FOUND, UNAUTHORIZED, INVALID_REQUEST, INVALID_DATA, INTERNAL_ERROR
+from comment import Comment
 from googleapiclient.discovery import build
 import os
 import socket, threading, json
@@ -25,6 +26,7 @@ class TuneTogetherServer:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connected_users = [] # list of connected users' usernames
         self.connected_clients = [] # list of connected clients' sockets
+        self.live_chat_messages = [] # list of live chat messages
 
 
     def start(self):
@@ -90,9 +92,20 @@ class TuneTogetherServer:
 
                     elif request.request_code == DISCONNECT:
                         response_json = self.disconnect_client(conn_socket)
+                        break
+                    
+                    elif request.request_code == GET_LIVE_CHAT_MESSAGES:
+                        response = ServerResponse(OK, "Live chat messages retrieved.", messages=self.live_chat_messages)
+                        print(f"response code: {response.response_code}, response message: {response.message}, response messages(in server): {response.messages}")
+                        response_json = response.to_json()
                         print("response sending: ", response_json)
                         break
 
+                    elif request.request_code == LIVE_CHAT_MESSAGE:
+                        response_json = self.add_message_to_live_chat(Comment.from_dict(request.payload))
+                        print("response sending: ", response_json)
+                        break
+                    
                     else:
                         response = ServerResponse(INVALID_REQUEST, "Invalid request code.")
                         response_json = response.to_json()
@@ -203,29 +216,12 @@ class TuneTogetherServer:
             print("Client socket closed.")
 
     
-    #-----------song playing methods-------------------
-
-
-    def search_song(self, query: str):
-        '''Search for a song on YouTube using the provided query.
-        :param query: The search query for the song (should be the song's name).
-        :return: The URL of the first matching song to the search query.
-        '''
-        search_response = YOUTUBE.search().list(
-            q=query,                   # Search query (song name)
-            part="snippet",            # Request snippet data (title, ID, etc.)
-            type="video",              # Only look for videos (not channels/playlists)
-            videoCategoryId="10",      # Filter results to category 10 (Music)
-            maxResults=1               # Get only the top result
-        ).execute()
-
-        # Extract video ID from the API response
-        if search_response["items"]:
-            song_id = search_response["items"][0]["id"]["videoId"]
-            song_url = f"https://www.youtube.com/watch?v={song_id}"
-            return song_url
-        
-        return None  # Return None if no result found
+    def add_message_to_live_chat(self, message: Comment):
+        """Adds a message to the live chat.
+        """
+        self.live_chat_messages.append(message)
+        print(f"Message added to live chat: {message}")
+        return ServerResponse(OK, "Message added to live chat.")
 
 
 def main():
