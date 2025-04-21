@@ -55,6 +55,9 @@ class RegisterPage(Page):
     def register(self, username: str, password: str, age: int):
         '''Sends a register request to the server'''
         print(f"username: {username}, password: {password}, age: {age}")
+        if username == "" or password == "" or age == "":
+            messagebox.showerror("Error", "Please fill in all fields.")
+            return
         password_hash = self.hash_password(password)
         request = ServerRequest.create_register_payload(username, password_hash, age)
         response = self.connected_client.send_request(request)
