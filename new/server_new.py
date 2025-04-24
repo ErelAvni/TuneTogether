@@ -95,21 +95,14 @@ class TuneTogetherServer:
                         break
                     
                     elif request.request_code == GET_LIVE_CHAT_MESSAGES:
-                        response = ServerResponse(OK, "Live chat messages retrieved.", messages=self.live_chat_messages)
-                        print(f"response code: {response.response_code}, response message: {response.message}, response messages(in server): {response.messages}")
-                        response_json = response.to_json()
-                        print("response sending: ", response_json)
-                        break
+                        response_json = self.get_live_chat_messages()
 
                     elif request.request_code == LIVE_CHAT_MESSAGE:
                         response_json = self.add_message_to_live_chat(Comment.from_dict(request.payload))
-                        print("response sending: ", response_json)
-                        break
                     
                     else:
                         response = ServerResponse(INVALID_REQUEST, "Invalid request code.")
                         response_json = response.to_json()
-
                     
                     # Encrypt the response using Fernet
                     encrypted_response = fernet.encrypt(response_json.encode('utf-8'))
@@ -222,6 +215,13 @@ class TuneTogetherServer:
         self.live_chat_messages.append(message)
         print(f"Message added to live chat: {message}")
         return ServerResponse(OK, "Message added to live chat.")
+
+
+    def get_live_chat_messages(self):
+        """Returns all messages in the live chat in a response json."""
+        response = ServerResponse(OK, "Live chat messages retrieved.", messages=self.live_chat_messages)
+        response_json = response.to_json()
+        return response_json
 
 
 def main():

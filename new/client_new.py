@@ -51,18 +51,22 @@ class Client:
             byte_request = request_json.encode('utf-8')
             encrypted_request = self.fernet.encrypt(byte_request)
             self.client_socket.send(encrypted_request)
-            print("past line 54 for request code: ", request.request_code)
             # Wait for the server's response
             encrypted_response = self.client_socket.recv(2048)
             byte_response = self.fernet.decrypt(encrypted_response)
-            print("past line 58 for request code: ", request.request_code)
             response_json = byte_response.decode('utf-8')
             response_dict = json.loads(response_json)
-            response = ServerResponse(response_dict['status_code'], response_dict['message'])
-            # If the response contains a username, update the instance variable
+            response = ServerResponse(
+                response_dict['status_code'], 
+                response_dict['message'], 
+                response_dict['username'] if 'username' in response_dict else None, 
+                response_dict['messages'] if 'messages' in response_dict else None)
+            
             if 'username' in response_dict:
                 self.username = response_dict['username']
-                print(f"Connected user: {self.username}")
+
+            print("Request: ", request.to_dict())
+            print("response: ", response.to_dict())
             return response
 
         except Exception as e:

@@ -25,7 +25,6 @@ class ServerResponse:
         self.message = message if message else response_code
         self.username = username
         self.messages = messages
-        print("messges (in the response class): ", self.messages)
 
 
     def to_dict(self):
@@ -42,14 +41,12 @@ class ServerResponse:
                 }
             
             if self.messages != None:
-                print("entered the messages if")
                 return {
                     "status_code": self.response_code,
                     "message": self.message,
                     "messages": [message.to_dict() for message in self.messages],
                 }
             
-            print("messages are considered None")
             return {
                 "status_code": self.response_code,
                 "message": self.message,

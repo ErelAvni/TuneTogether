@@ -1,7 +1,6 @@
 from page import Page
 from client_new import Client
 from server_request_new import ServerRequest, LIVE_CHAT_MESSAGE, GET_LIVE_CHAT_MESSAGES
-from server_response import ServerResponse
 import tkinter as tk
 from tkinter import messagebox
 from comment import Comment
@@ -28,7 +27,6 @@ class LiveChatPage(Page):
 
         chat_inner = tk.Frame(chat_canvas, bg="white")
         chat_canvas.create_window((0, 0), window=chat_inner, anchor='nw')
-
 
         chat_inner.bind("<Configure>", lambda e: chat_canvas.configure(scrollregion=chat_canvas.bbox("all")))
         chat_canvas.bind("<Enter>", lambda e: active_canvas.update({"canvas": chat_canvas}))
@@ -62,15 +60,37 @@ class LiveChatPage(Page):
         comment_text_widget.delete("1.0", tk.END)
 
 
+    def create_add_message_section(self, chat_inner):
+        """Create the section for adding messages to the chat."""
+        add_frame = tk.Frame(chat_inner, bg="white", bd=1, relief='solid', padx=10, pady=10)
+        add_frame.pack(pady=5)
+
+        tk.Label(add_frame, text="Add message", bg="white").pack()
+        tk.Label(add_frame, text="Message data", bg="white").pack()
+
+        # Create the Text widget and store a reference to it
+        comment_text_widget = tk.Text(add_frame, height=6, width=30, bg="#d3d3d3")
+        comment_text_widget.pack(pady=5)
+
+        # Pass the Text widget to the button's command
+        tk.Button(
+            add_frame,
+            text="SEND",
+            bg="#4b9c97",
+            fg="white",
+            command=lambda: self.add_message(comment_text_widget)
+        ).pack()
+
+
     def update_chat(self, chat_inner):
         """Fetch new messages and update the chat display."""
         # Fetch messages from the server or shared data source
-        all_messages = self.connected_client.send_request(ServerRequest(GET_LIVE_CHAT_MESSAGES))
+        messages_response = self.connected_client.send_request(ServerRequest(GET_LIVE_CHAT_MESSAGES))
+        all_messages = messages_response.messages if messages_response.response_code == "OK" else []
         # Clear the current chat display
         for widget in chat_inner.winfo_children():
             widget.destroy()
 
-        print(all_messages)
         # Add each message to the chat display
         for message in all_messages:
             text = message.__repr__()
