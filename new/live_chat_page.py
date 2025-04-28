@@ -10,29 +10,44 @@ class LiveChatPage(Page):
         super().__init__(parent, controller, connected_client, bg_param="#95DBCD")
         super().create_top_bar(connected_client.username)  # Create the top bar with username
         
+        self.update_chat_id = None  # Initialize the update chat ID
+
         # back button
         back_button = tk.Button(self.top_bar, text="Back", font=("Arial", 20), bg="#4CAF50", fg="white", command=lambda:self.controller.show_frame("MainPage"))
-        back_button.pack(side=tk.RIGHT, padx=10, pady=5)  # Add padding to the button
-        
+        back_button.pack(side=tk.RIGHT, padx=10, pady=5)
+
+        # Make content frame expandable
+        self.content_frame.grid_columnconfigure(0, weight=1)
+
         active_canvas = {"canvas": None}
 
+        # Chat frame
         chat_frame = tk.Frame(self.content_frame, bg="white", bd=1, relief='solid')
-        tk.Label(chat_frame, text="Live chat with all connected users", fg="black", bg="white").pack(anchor="w", padx=10, pady=5)
-        
-        chat_canvas = tk.Canvas(chat_frame, width=800, height=500, bg="white", highlightthickness=0)
+        chat_frame.grid(row=0, column=0, padx=10, pady=(10, 5), sticky="ew")
+        chat_frame.grid_columnconfigure(0, weight=1)
+
+        tk.Label(chat_frame, text="Live chat with all connected users", fg="black", bg="white").grid(row=0, column=0, sticky="w", padx=10, pady=5)
+
+        chat_canvas = tk.Canvas(chat_frame, bg="white", highlightthickness=0)
         chat_scroll = tk.Scrollbar(chat_frame, orient="vertical", command=chat_canvas.yview)
         chat_canvas.configure(yscrollcommand=chat_scroll.set)
-        chat_canvas.pack(fill="both", expand=True)
-        chat_scroll.pack(side="right", fill="y")
+
+        chat_canvas.grid(row=1, column=0, sticky="nsew")
+        chat_scroll.grid(row=1, column=1, sticky="ns")
+
+        chat_frame.grid_rowconfigure(1, weight=1)  # Allow canvas to grow vertically
 
         chat_inner = tk.Frame(chat_canvas, bg="white")
         chat_canvas.create_window((0, 0), window=chat_inner, anchor='nw')
 
+        add_message_frame = self.create_add_message_section()
+        add_message_frame.grid(row=1, column=0, padx=10, pady=(5, 10), sticky="ew")
+
+        # Bind scrolling
         chat_inner.bind("<Configure>", lambda e: chat_canvas.configure(scrollregion=chat_canvas.bbox("all")))
         chat_canvas.bind("<Enter>", lambda e: active_canvas.update({"canvas": chat_canvas}))
         chat_canvas.bind("<Leave>", lambda e: active_canvas.update({"canvas": None}) if active_canvas["canvas"] == chat_canvas else None)
-        chat_frame.grid(row=0, column=0, padx=200)
-        
+
         self.controller.bind_all("<MouseWheel>", lambda e: active_canvas["canvas"].yview_scroll(-1 * int(e.delta / 120), "units") if active_canvas["canvas"] else None)
 
         self.update_chat(chat_inner)  # Start updating the chat
@@ -40,6 +55,10 @@ class LiveChatPage(Page):
 
     def add_message(self, comment_text_widget: tk.Text):
         '''Adds a message to the live chat.'''
+        if self.update_chat_id:
+            self.after_cancel(self.update_chat_id)  # Cancel the scheduled `after` call
+            self.update_chat_id = None
+
         comment_text = comment_text_widget.get("1.0", tk.END).strip()
 
         if not comment_text:
@@ -59,27 +78,29 @@ class LiveChatPage(Page):
         # Clear the Text widget
         comment_text_widget.delete("1.0", tk.END)
 
+        # Restart the chat update
+        self.update_chat_id = self.after(1000, lambda: self.update_chat(comment_text_widget.master))  # Update every 1 second
 
-    def create_add_message_section(self, chat_inner):
+
+    def create_add_message_section(self):
         """Create the section for adding messages to the chat."""
-        add_frame = tk.Frame(chat_inner, bg="white", bd=1, relief='solid', padx=10, pady=10)
-        add_frame.pack(pady=5)
+        add_frame = tk.Frame(self.content_frame, bg="white", bd=1, relief='solid', padx=2, pady=2)
+        add_frame.grid_columnconfigure(0, weight=1)
 
-        tk.Label(add_frame, text="Add message", bg="white").pack()
-        tk.Label(add_frame, text="Message data", bg="white").pack()
+        tk.Label(add_frame, text="Add message", bg="white").grid(row=0, column=0, sticky="w", padx=10, pady=5)
 
-        # Create the Text widget and store a reference to it
-        comment_text_widget = tk.Text(add_frame, height=6, width=30, bg="#d3d3d3")
-        comment_text_widget.pack(pady=5)
+        comment_text_widget = tk.Text(add_frame, bg="#d3d3d3", height=5)
+        comment_text_widget.grid(row=1, column=0, sticky="ew", padx=10)
 
-        # Pass the Text widget to the button's command
         tk.Button(
             add_frame,
             text="SEND",
             bg="#4b9c97",
             fg="white",
             command=lambda: self.add_message(comment_text_widget)
-        ).pack()
+        ).grid(row=2, column=0, sticky="e", padx=10, pady=5)
+
+        return add_frame
 
 
     def update_chat(self, chat_inner):
@@ -97,4 +118,12 @@ class LiveChatPage(Page):
             tk.Label(chat_inner, text=text, bg="white", anchor="w", justify="left", wraplength=780).pack(fill="x", padx=5, pady=3)
 
         # Schedule the next update
-        self.after(1000, lambda: self.update_chat(chat_inner))  # Update every 1 second
+        self.update_chat_id = self.after(1000, lambda: self.update_chat(chat_inner))  # Update every 1 second
+
+    
+    def destroy(self):
+        """Clean up resources when the page is destroyed."""
+        if self.update_chat_id:
+            self.after_cancel(self.update_chat_id)  # Cancel the scheduled `after` call
+            self.update_chat_id = None
+        super().destroy()  # Call the parent class's destroy method
