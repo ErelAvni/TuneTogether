@@ -27,6 +27,7 @@ class TuneTogetherServer:
         self.connected_users = [] # list of connected users' usernames
         self.connected_clients = [] # list of connected clients' sockets
         self.live_chat_messages = [] # list of live chat messages
+        self.lock = threading.Lock()  # Lock for thread safety
 
 
     def start(self):
@@ -125,103 +126,109 @@ class TuneTogetherServer:
 
     def login_user(self, username: str, password_hash: str):
         """Handles the login request from the client."""
-        users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
+        with self.lock:
+            users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
 
-        if username not in users:
-            response = ServerResponse(DATA_NOT_FOUND, f"User {username} not found.")
+            if username not in users:
+                response = ServerResponse(DATA_NOT_FOUND, f"User {username} not found.")
 
-        else:
-            user = users[username]
-            if user['password_hash'] != password_hash:
-                response = ServerResponse(UNAUTHORIZED, "Invalid password.")
-            
             else:
-                if not self.connect_user(username):
-                    response = ServerResponse(INVALID_DATA, f"User {username} is already connected.")
+                user = users[username]
+                if user['password_hash'] != password_hash:
+                    response = ServerResponse(UNAUTHORIZED, "Invalid password.")
+                
                 else:
-                    response = ServerResponse(OK, f"User {username} logged in.", username)
-                print(f"User {username} logged in.")
+                    if not self.connect_user(username):
+                        response = ServerResponse(INVALID_DATA, f"User {username} is already connected.")
+                    else:
+                        response = ServerResponse(OK, f"User {username} logged in.", username)
+                    print(f"User {username} logged in.")
 
-        return response.to_json()
+            return response.to_json()
 
 
     def register_user(self, username: str, password_hash: str, age: int):
         """Handles the registration request from the client."""
-        users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
+        with self.lock:
+            users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
 
-        if username in users:
-            resopnse = ServerResponse(INVALID_DATA, f"Username \"{username}\" already taken.")
-            return resopnse.to_json()
-        
-        if not self.connect_user(username):
-            response = ServerResponse(INVALID_DATA, f"User {username} is already connected.")
-            return response.to_json()
+            if username in users:
+                resopnse = ServerResponse(INVALID_DATA, f"Username \"{username}\" already taken.")
+                return resopnse.to_json()
+            
+            if not self.connect_user(username):
+                response = ServerResponse(INVALID_DATA, f"User {username} is already connected.")
+                return response.to_json()
 
-        user_dict = {
-            "username": username,
-            "password_hash": password_hash,
-            "age": age
-        }
+            user_dict = {
+                "username": username,
+                "password_hash": password_hash,
+                "age": age
+            }
 
-        if (DButilites.update_data_to_json(user_dict, DButilites.USER_DB_PATH)):
-            print(f"User {username} registered.")
-            response = ServerResponse(OK, f"User {username} registered.", username).to_json()
-        
-        else:
-            response = ServerResponse(INVALID_DATA, "Error while registering user.").to_json()
-        
-        return response
+            if (DButilites.update_data_to_json(user_dict, DButilites.USER_DB_PATH)):
+                print(f"User {username} registered.")
+                response = ServerResponse(OK, f"User {username} registered.", username).to_json()
+            
+            else:
+                response = ServerResponse(INVALID_DATA, "Error while registering user.").to_json()
+            
+            return response
 
 
     def logout_user(self, username: str):
         """Handles the logout request from the client."""
-        if username not in self.connected_users:
-            response = ServerResponse(INVALID_DATA, f"User {username} is not connected.")
-            return response.to_json()
+        with self.lock:
+            if username not in self.connected_users:
+                response = ServerResponse(INVALID_DATA, f"User {username} is not connected.")
+                return response.to_json()
 
-        self.connected_users.remove(username)
-        print(f"User {username} logged out.")
-        response = ServerResponse(OK, f"User {username} logged out.").to_json()
-        return response
+            self.connected_users.remove(username)
+            print(f"User {username} logged out.")
+            response = ServerResponse(OK, f"User {username} logged out.").to_json()
+            return response
 
 
     def disconnect_client(self, conn_socket):
         """
         Handle client disconnection.
         """
-        response = ServerResponse("OK", "Client disconnected.")
-        response_json = response.to_json()
+        with self.lock:
+            response = ServerResponse("OK", "Client disconnected.")
+            response_json = response.to_json()
 
-        try:
-            # Send the response to the client
-            conn_socket.send(response_json.encode('utf-8'))
-            print(f"Sent disconnect response: {response_json}")
+            try:
+                # Send the response to the client
+                conn_socket.send(response_json.encode('utf-8'))
+                print(f"Sent disconnect response: {response_json}")
 
-            # Allow time for the client to receive the response
-            conn_socket.shutdown(socket.SHUT_WR)  # Shutdown the write side of the socket
-        except Exception as e:
-            print(f"Error sending disconnect response: {e}")
-        finally:
-            # Remove the client from the connected clients list and close the socket
-            if conn_socket in self.connected_clients:
-                self.connected_clients.remove(conn_socket)
-            conn_socket.close()
-            print("Client socket closed.")
+                # Allow time for the client to receive the response
+                conn_socket.shutdown(socket.SHUT_WR)  # Shutdown the write side of the socket
+            except Exception as e:
+                print(f"Error sending disconnect response: {e}")
+            finally:
+                # Remove the client from the connected clients list and close the socket
+                if conn_socket in self.connected_clients:
+                    self.connected_clients.remove(conn_socket)
+                conn_socket.close()
+                print("Client socket closed.")
 
     
     def add_message_to_live_chat(self, message: Comment):
         """Adds a message to the live chat.
         """
-        self.live_chat_messages.append(message)
-        print(f"Message added to live chat: {message}")
-        return ServerResponse(OK, "Message added to live chat.")
+        with self.lock:
+            self.live_chat_messages.append(message)
+            print(f"Message added to live chat: {message}")
+            return ServerResponse(OK, "Message added to live chat.")
 
 
     def get_live_chat_messages(self):
         """Returns all messages in the live chat in a response json."""
-        response = ServerResponse(OK, "Live chat messages retrieved.", messages=self.live_chat_messages)
-        response_json = response.to_json()
-        return response_json
+        with self.lock:
+            response = ServerResponse(OK, "Live chat messages retrieved.", messages=self.live_chat_messages)
+            response_json = response.to_json()
+            return response_json
 
 
 def main():
