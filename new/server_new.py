@@ -175,7 +175,7 @@ class TuneTogetherServer:
 
         if (DButilites.update_data_to_json(user_dict, DButilites.USER_DB_PATH)):
             print(f"User {username} registered.")
-            response = ServerResponse(OK, f"User {username} registered.", username, REGISTER).to_json()
+            response = ServerResponse(OK, f"User {username} registered.", REGISTER, username).to_json()
         
         else:
             response = ServerResponse(INVALID_DATA, "Error while registering user.", REGISTER).to_json()

@@ -1,4 +1,3 @@
-#TODO: learn how to use spotify API to get the song image and the artist. 
 import db.DButilites as DButilities
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -25,11 +24,17 @@ youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
 
 class Song:
-    def __init__(self, song_name: str):
+    def __init__(self, song_name: str, song_average_stars: int = 5):
         '''Initializes a song object. Will work only for songs that are in the database.
         :param song_name: the name of the song. Needs to be in \"Some Song Name\" format.
         '''
         self.song_name = song_name
+
+        self.all_ratings = DButilities.load_data_from_json(DButilities.SONG_RATINGS_PATH)[song_name]
+        print(f"Song {self.song_name} initialized.")
+
+        self.star_image = self.get_star_image()
+
         
         song_paths_dict = DButilities.load_data_from_json(DButilities.SONG_PATHS_PATH)
         try:
@@ -50,6 +55,42 @@ class Song:
             raise ValueError(f"Song {song_name} not found in Spotify.")
 
     
+    @property
+    def average_stars(self):
+        return sum(self.all_ratings.values()) / len(self.all_ratings) if self.all_ratings else 0
+    
+
+    def get_star_image(self):
+        """Returns the star image for the song based on the average value.
+        :return: the image in a format that can be used for the button. To use it, you need to convert it to a PhotoImage object."""
+        full_star_image = Image.open("new\\images\\full_star.png")  # Full star image
+        half_star_image = Image.open("new\\images\\half_star.png")
+        empty_star_image = Image.open("new\\images\\empty_star.png")
+
+        # Resize images to 20x20 pixels for the stars
+        full_star_image = full_star_image.resize((20, 20), Image.Resampling.LANCZOS)
+        half_star_image = half_star_image.resize((20, 20), Image.Resampling.LANCZOS)
+        empty_star_image = empty_star_image.resize((20, 20), Image.Resampling.LANCZOS)
+
+        full_stars = int(self.average_stars)  # Number of full stars
+        half_stars = 0  # Number of half stars
+        if self.average_stars % 1 >= 0.5:
+            full_stars += 1
+        elif self.average_stars % 1 < 0.5:
+            half_stars = 1
+
+        star_image = Image.new("RGBA", (100, 20))  # Create a new image for the stars
+        for i in range(5):
+            if i < full_stars:
+                star_image.paste(full_star_image, (i * 20, 0))
+            elif i < full_stars + half_stars:
+                star_image.paste(half_star_image, (i * 20, 0))
+            else:
+                star_image.paste(empty_star_image, (i * 20, 0))
+
+        return star_image
+
+
     def get_song_info(self):
         '''Gets info on a song by its name using the Spotify API.
         :Returns: tuple of the artist and the song image URL'''
@@ -149,6 +190,8 @@ class Song:
         :return: a dictionary with the song name, artist, and album cover'''
         return {
             "song_name": self.song_name,
+            "average_stars": self.average_stars,
+            "star_image": self.star_image,
             "song_audio_file_path": self.song_audio_file_path,
             "artist": self.artist,
             "album_cover": self.album_cover
@@ -159,3 +202,4 @@ class Song:
         '''Returns a JSON representation of the song object.
         :return: a JSON string with the song name, artist, and album cover'''
         return json.dumps(self.to_dict())
+

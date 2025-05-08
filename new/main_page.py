@@ -5,7 +5,7 @@ from tkinter import messagebox
 from page import Page
 import pygame
 from song import Song
-import os
+import db.DButilites as DButilities
 
 
 class MainPage(Page):
@@ -17,6 +17,12 @@ class MainPage(Page):
         self.mixer_music = self.mixer.music
         self.current_loaded_song = None  # Track the currently loaded song
         self.song_boxes = {}  # song_name: song_box_frame mapping
+
+        self.full_star_image = Image.open("new\\images\\full_star.png").resize((20, 20), Image.Resampling.LANCZOS)
+        self.empty_star_image = Image.open("new\\images\\empty_star.png").resize((20, 20), Image.Resampling.LANCZOS)
+        self.full_star_tk = ImageTk.PhotoImage(self.full_star_image)
+        self.empty_star_tk = ImageTk.PhotoImage(self.empty_star_image)
+
         self.create_grid()
 
 
@@ -132,6 +138,12 @@ class MainPage(Page):
         except Exception as e:
             print(f"Error loading song image: {e}")
 
+        # Display user's star rating (interactive)
+        try:
+            self.display_user_star_rating(box_frame, song)
+        except Exception as e:
+            print(f"Error loading user star rating: {e}")
+
         # Load the play button image
         play_image_path = "new\\images\\play_icon.png"
         try:
@@ -155,10 +167,6 @@ class MainPage(Page):
         play_button.image = play_image_tk  # Keep a reference to prevent garbage collection
         play_button.pack(side=tk.LEFT, padx=5, pady=(5, 8))
 
-
-        # pause error message when play button is pressed before song is played:"pygame.error: mixer not initialized"
-                
-
         # Store the play button and state in the frame
         box_frame.play_button = play_button
         box_frame.is_playing = False  # Initial state is not playing
@@ -169,6 +177,61 @@ class MainPage(Page):
         # Comment Button
         comment_button = tk.Button(box_frame, text="Comment", width=10, command=lambda: self.controller.show_frame("CommentPage", song_name=song.song_name))
         comment_button.pack(side=tk.RIGHT, padx=5, pady=5)
+
+
+    def display_user_star_rating(self, parent_frame, song: Song):
+        selected_rating = tk.IntVar(value=song.all_ratings.get(self.username, 0))
+
+        # --- Load images ---
+        full_star_img = Image.open("new\\images\\full_star.png").resize((20, 20))
+        empty_star_img = Image.open("new\\images\\empty_star.png").resize((20, 20))
+
+        self.full_star_tk = ImageTk.PhotoImage(full_star_img)
+        self.empty_star_tk = ImageTk.PhotoImage(empty_star_img)
+
+        # --- Average Rating Display ---
+        avg_star_img = song.get_star_image().resize((100, 20))  # match display size
+        avg_star_tk = ImageTk.PhotoImage(avg_star_img)
+        avg_star_label = tk.Label(parent_frame, image=avg_star_tk, bg="#95DBCD")
+        avg_star_label.image = avg_star_tk  # prevent GC
+        avg_star_label.pack()
+
+        # --- User Rating Buttons ---
+        star_buttons = []
+        button_frame = tk.Frame(parent_frame, bg="#95DBCD")
+        button_frame.pack()
+
+        def update_stars(rating):
+            selected_rating.set(rating)
+            for i, btn in enumerate(star_buttons):
+                img = self.full_star_tk if i < rating else self.empty_star_tk
+                btn.config(image=img)
+
+            # Update in-memory and save to file
+            db_data = DButilities.load_data_from_json(DButilities.SONG_RATINGS_PATH)
+            if song.song_name not in db_data:
+                db_data[song.song_name] = {}
+            db_data[song.song_name][self.username] = rating
+            DButilities.update_data_to_json(db_data, DButilities.SONG_RATINGS_PATH, manual_update=True)
+
+            # Update song.all_ratings and refresh average
+            song.all_ratings[self.username] = rating
+
+            # Refresh average image
+            new_avg_image = song.get_star_image().resize((100, 20))
+            new_avg_tk = ImageTk.PhotoImage(new_avg_image)
+            avg_star_label.configure(image=new_avg_tk)
+            avg_star_label.image = new_avg_tk  # update reference
+
+        # Create star buttons for user rating
+        for i in range(5):
+            img = self.full_star_tk if i < selected_rating.get() else self.empty_star_tk
+            btn = tk.Button(button_frame, image=img, bg="#95DBCD", borderwidth=0,
+                            command=lambda rating=i+1: update_stars(rating))
+            btn.image = img
+            btn.pack(side=tk.LEFT, padx=1)
+            star_buttons.append(btn)
+
 
 
     def display_song_info(self, song: Song):

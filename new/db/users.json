@@ -7,7 +7,7 @@
     "erel": {
         "username": "erel",
         "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
-        "age": 18
+        "age": "18"
     },
     "admin": {
         "username": "admin",
@@ -19,39 +19,9 @@
         "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
         "age": "18"
     },
-    "nigga": {
-        "username": "nigga",
-        "password_hash": "08a841e996781e9e77d30a4e4420a8f501a280b00624e6d1224bf54aaff73eba",
-        "age": "100"
-    },
     "user": {
         "username": "user",
         "password_hash": "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb",
-        "age": "21"
-    },
-    "ron": {
-        "username": "ron",
-        "password_hash": "32801f5c6ca59882d004c3b927de38fa22fa1ed71e0f63d66707f000f2587eac",
-        "age": "17"
-    },
-    "shalev": {
-        "username": "shalev",
-        "password_hash": "32801f5c6ca59882d004c3b927de38fa22fa1ed71e0f63d66707f000f2587eac",
-        "age": "17.9"
-    },
-    "Itay": {
-        "username": "Itay",
-        "password_hash": "1739b267e8d064848099791a1e1da5423564e586d23a6057879df0b768af61c8",
-        "age": "17"
-    },
-    "Yuval": {
-        "username": "Yuval",
-        "password_hash": "acc539b5c96544fe89f57530fd17376553e2ea45f49ae83f686296c47de3b443",
-        "age": "26"
-    },
-    "or": {
-        "username": "or",
-        "password_hash": "7175517a370b5cd2e664e3fd29c4ea9db5ce17058eb9772fe090a5485e49dad6",
         "age": "18"
     }
 }
