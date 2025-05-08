@@ -27,12 +27,7 @@ class TuneTogetherServer:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connected_users = [] # list of connected users' usernames
         self.connected_clients = [] # list of connected clients' sockets
-        self.live_chat_messages = [
-            Comment("user1", "Hello everyone!"),
-            Comment("user2", "Hi user1! How are you?"),
-            Comment("user3", "Good morning!"),
-            Comment("user4", "What's the topic for today?")
-        ]
+        self.live_chat_messages = [ Comment("server", "Welcome to TuneTogether!") ]
 
 
     def start(self):
