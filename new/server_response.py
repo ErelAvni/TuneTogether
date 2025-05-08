@@ -1,5 +1,4 @@
 import json
-from comment import Comment
 
 
 #CONSTS:
@@ -12,17 +11,19 @@ INTERNAL_ERROR = "INTERNAL_ERROR"
 
 
 class ServerResponse:
-    def __init__(self, response_code: str, message: str, username: str = None, messages: list = None):
+    def __init__(self, response_code: str, message: str, request_code: str = None, username: str = None, messages: list = None):
         """
         Initialize a ServerResponse object.
 
         :param response_code: string code of the result of the server's operation.
         :param message: A message providing additional information about the response.
+        :param request_code: The type of request that was made which the response is for (e.g., COMMENT, LOGIN, REGISTER ect).
         :param username: The username of the user connected to the server. Should only be used in the login or register request.
         :param messages: All of the messages in the live chat. Should only be used in the live chat request.
         """
         self.response_code = response_code
         self.message = message if message else response_code
+        self.request_code = request_code
         self.username = username
         self.messages = messages
 
@@ -35,21 +36,24 @@ class ServerResponse:
             """
             if self.username:
                 return {
-                    "status_code": self.response_code,
+                    "response_code": self.response_code,
                     "message": self.message,
+                    "request_code": self.request_code,
                     "username": self.username, 
                 }
             
-            if self.messages != None:
+            if self.messages:
                 return {
-                    "status_code": self.response_code,
+                    "response_code": self.response_code,
                     "message": self.message,
+                    "request_code": self.request_code,
                     "messages": [message.to_dict() for message in self.messages],
                 }
             
             return {
-                "status_code": self.response_code,
+                "response_code": self.response_code,
                 "message": self.message,
+                "request_code": self.request_code,
             }
 
 

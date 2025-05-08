@@ -5,6 +5,8 @@ from server_response import ServerResponse
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.fernet import Fernet
+import threading
+from comment import Comment
 
 
 class Client:
@@ -13,6 +15,7 @@ class Client:
         self.port = port
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.username = None #username of the connected user. if none, the client is not connected to any user
+        self.lock = threading.Lock()  # Lock for thread-safe operations
 
 
     def connect(self):
@@ -44,34 +47,75 @@ class Client:
             print(f"Failed to connect to server: {e}")
 
 
-    def send_request(self, request: ServerRequest):
-        try:
-            # Send the request to the server
-            request_json = request.to_json()
-            byte_request = request_json.encode('utf-8')
-            encrypted_request = self.fernet.encrypt(byte_request)
-            self.client_socket.send(encrypted_request)
-            # Wait for the server's response
-            encrypted_response = self.client_socket.recv(2048)
-            byte_response = self.fernet.decrypt(encrypted_response)
-            response_json = byte_response.decode('utf-8')
-            response_dict = json.loads(response_json)
-            response = ServerResponse(
-                response_dict['status_code'], 
-                response_dict['message'], 
-                response_dict['username'] if 'username' in response_dict else None, 
-                response_dict['messages'] if 'messages' in response_dict else None)
-            
-            if 'username' in response_dict:
-                self.username = response_dict['username']
+    def send_request(self, request: ServerRequest) -> ServerResponse:
+        with self.lock:  # Ensure thread-safe access to the socket
+            try:
+                # Send initial request
+                request_json = request.to_json()
+                byte_request = request_json.encode('utf-8')
+                encrypted_request = self.fernet.encrypt(byte_request)
+                self.client_socket.send(encrypted_request)
 
-            print("Request: ", request.to_dict())
-            print("response: ", response.to_dict())
-            return response
+                # First response (handshake start)
+                encrypted_response = self.client_socket.recv(2048)
+                byte_response = self.fernet.decrypt(encrypted_response)
+                response_json = byte_response.decode('utf-8')
+                response_dict = json.loads(response_json)
+
+                if response_dict["request_code"] != request.request_code:
+                    print(f"Request code mismatch: {response_dict['request_code']} != {request.request_code}")
+                    raise Exception(f"Expected response for {request.request_code}, but got {response_dict['request_code']}")
+
+                if request.request_code == "GET_LIVE_CHAT_MESSAGES" and response_dict["message"] == "Ready to send chunks":
+                    return self._receive_message_chunks()
+
+                response = ServerResponse(
+                    response_dict['response_code'], 
+                    response_dict['message'], 
+                    response_dict['request_code'],
+                    response_dict['username'] if 'username' in response_dict else None)
+                
+                if 'username' in response_dict:
+                    self.username = response_dict['username']
+
+                if 'messages' in response_dict:
+                    response.messages = [Comment.from_dict(message) for message in response_dict['messages']]
+            
+                print(f"Server response (normal one): {response.response_code} - {response.message}")
+                return response
+            
+            except Exception as e:
+                print(f"Error sending request: {e}")
+                return None
+
+
+    def _receive_message_chunks(self):
+        try:
+            # Step 3: send OK to server
+            ok_response = ServerResponse("OK", "OK")
+            self.client_socket.send(self.fernet.encrypt(ok_response.to_json().encode('utf-8')))
+
+            all_messages = []
+
+            while True:
+                encrypted_chunk = self.client_socket.recv(2048)
+                if not encrypted_chunk:
+                    return ServerResponse("INTERNAL_ERROR", "No data received from server.")
+
+                chunk_json = self.fernet.decrypt(encrypted_chunk).decode('utf-8')
+                chunk_dict = json.loads(chunk_json)
+
+                if chunk_dict["message"] == "DONE":
+                    break
+
+                chunk_messages = [Comment.from_dict(m) for m in chunk_dict.get("messages", [])]
+                all_messages.extend(chunk_messages)
+
+            return ServerResponse("OK", "All messages retrieved", messages=all_messages)
 
         except Exception as e:
-            print(f"Error sending request: {e}")
-            return None
+            print(f"Error receiving message chunks: {e}")
+            return ServerResponse("INTERNAL_ERROR", "Error during message chunk reception")
 
 
     def close(self):

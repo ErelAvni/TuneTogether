@@ -1,21 +1,18 @@
-import threading
 from page import Page
 from client_new import Client
 from server_request_new import ServerRequest, LIVE_CHAT_MESSAGE, GET_LIVE_CHAT_MESSAGES
 import tkinter as tk
 from tkinter import messagebox
 from comment import Comment
-import time
+
+
+MAX_CHAT_LENGTH = 200  # or whatever limit you want
 
 
 class LiveChatPage(Page):
     def __init__(self, parent, controller, connected_client: Client):
         super().__init__(parent, controller, connected_client, bg_param="#95DBCD")
         super().create_top_bar(connected_client.username)  # Create the top bar with username
-        
-        self.running = False
-        self.poll_thread = None
-        self.lock = threading.Lock()
 
         # back button
         back_button = tk.Button(self.top_bar, text="Back", font=("Arial", 20), bg="#4CAF50", fg="white", command=lambda:self.controller.show_frame("MainPage"))
@@ -31,61 +28,100 @@ class LiveChatPage(Page):
         chat_frame.grid(row=0, column=0, padx=10, pady=(10, 5), sticky="ew")
         chat_frame.grid_columnconfigure(0, weight=1)
 
-        tk.Label(chat_frame, text="Live chat with all connected users", fg="black", bg="white").grid(row=0, column=0, sticky="w", padx=10, pady=5)
 
-        chat_canvas = tk.Canvas(chat_frame, bg="white", highlightthickness=0)
-        chat_scroll = tk.Scrollbar(chat_frame, orient="vertical", command=chat_canvas.yview)
-        chat_canvas.configure(yscrollcommand=chat_scroll.set)
+        self.chat_canvas = tk.Canvas(chat_frame, bg="white", highlightthickness=0)
+        chat_scroll = tk.Scrollbar(chat_frame, orient="vertical", command=self.chat_canvas.yview)
+        self.chat_canvas.configure(yscrollcommand=chat_scroll.set)
 
-        chat_canvas.grid(row=1, column=0, sticky="nsew")
+        self.chat_canvas.grid(row=1, column=0, sticky="nsew")
         chat_scroll.grid(row=1, column=1, sticky="ns")
 
         chat_frame.grid_rowconfigure(1, weight=1)  # Allow canvas to grow vertically
 
-        chat_inner = tk.Frame(chat_canvas, bg="white")
-        chat_canvas.create_window((0, 0), window=chat_inner, anchor='nw')
+        chat_inner = tk.Frame(self.chat_canvas, bg="white")
+        self.chat_canvas.create_window((0, 0), window=chat_inner, anchor='nw')
+
+        self.create_title_section(chat_frame, chat_inner)  # Create the title section
+        self.update_chat(chat_inner)  # Fetch and display the chat messages
 
         add_message_frame = self.create_add_message_section()
         add_message_frame.grid(row=1, column=0, padx=10, pady=(5, 10), sticky="ew")
 
         # Bind scrolling
-        chat_inner.bind("<Configure>", lambda e: chat_canvas.configure(scrollregion=chat_canvas.bbox("all")))
-        chat_canvas.bind("<Enter>", lambda e: active_canvas.update({"canvas": chat_canvas}))
-        chat_canvas.bind("<Leave>", lambda e: active_canvas.update({"canvas": None}) if active_canvas["canvas"] == chat_canvas else None)
+        chat_inner.bind("<Configure>", lambda e: self.chat_canvas.configure(scrollregion=self.chat_canvas.bbox("all")))
+        self.chat_canvas.bind("<Enter>", lambda e: active_canvas.update({"canvas": self.chat_canvas}))
+        self.chat_canvas.bind("<Leave>", lambda e: active_canvas.update({"canvas": None}) if active_canvas["canvas"] == self.chat_canvas else None)
 
         self.controller.bind_all("<MouseWheel>", lambda e: active_canvas["canvas"].yview_scroll(-1 * int(e.delta / 120), "units") if active_canvas["canvas"] else None)
 
-        self.start_chat_polling(chat_inner)  # Start polling for chat messages
+
+    def update_chat(self, chat_inner: tk.Frame):
+        """Fetches the latest messages from the server and updates the chat window. In this version, it only fetches the messages once."""
+        # Clear current messages
+        for widget in chat_inner.winfo_children():
+            widget.destroy()
+
+        # Create a request to get the live chat messages
+        request = ServerRequest(GET_LIVE_CHAT_MESSAGES)
+
+        # Send the request to the server
+        response = self.connected_client.send_request(request)
+        try:
+            print(response.to_dict())
+        except Exception as e:
+            print("debug error:", e)
+            print("debug error:", type(response))
+            pass
+
+        if response.response_code == "OK":
+            # Add each message to the chat window
+            for message in response.messages:
+                text = message.__repr__()
+                tk.Label(chat_inner, text=text, bg="#d3d3d3", anchor="w", justify="left", wraplength=1200).pack(fill="x", padx=5, pady=3)
+            
+        else:
+            messagebox.showerror("Error", "Failed to fetch messages from the server.")
+
+        self.chat_canvas.update_idletasks()
+        self.chat_canvas.yview_moveto(1.0)  # Scroll to the bottom of the chat window
+
+
+    def create_title_section(self, chat_frame: tk.Frame, chat_inner: tk.Frame):
+        title_bar = tk.Frame(chat_frame, bg="white")
+        title_bar.grid(row=0, column=0, columnspan=2, sticky="ew", padx=10, pady=5)
+        title_bar.grid_columnconfigure(0, weight=1)
+
+        tk.Label(title_bar, text="Live chat with all connected users", fg="black", bg="white").grid(row=0, column=0, sticky="w")
+
+        tk.Button(
+            title_bar,
+            text="Refresh",
+            bg="#8bc34a",
+            fg="white",
+            command=lambda: self.update_chat(chat_inner)
+        ).grid(row=0, column=1, sticky="e", padx=(10, 0))
 
 
     def add_message(self, comment_text_widget: tk.Text):
-        '''Adds a message to the live chat.'''
-        with self.lock:
-            if self.update_chat_id:
-                self.after_cancel(self.update_chat_id)  # Cancel the scheduled `after` call
-                self.update_chat_id = None
+        '''Adds a message to the live chat. Calls the server to send the message to all connected users.'''
+        comment_text = comment_text_widget.get("1.0", tk.END).strip()
 
-            comment_text = comment_text_widget.get("1.0", tk.END).strip()
+        if not comment_text:
+            messagebox.showerror("Error", "Comment cannot be empty.")
+            return
 
-            if not comment_text:
-                messagebox.showerror("Error", "Comment cannot be empty.")
-                return
+        comment = Comment(
+            username=self.connected_client.username,
+            content=comment_text
+        )
+        
+        # Send the comment to the server
+        request = ServerRequest(LIVE_CHAT_MESSAGE, comment.to_dict())
 
-            comment = Comment(
-                username=self.connected_client.username,
-                content=comment_text
-            )
-            
-            # Send the comment to the server
-            request = ServerRequest(LIVE_CHAT_MESSAGE, comment.to_dict())
+        self.connected_client.send_request(request)
 
-            self.connected_client.send_request(request)
-
-            # Clear the Text widget
-            comment_text_widget.delete("1.0", tk.END)
-
-            # Restart the chat update
-            self.update_chat_id = self.after(1000, lambda: self.update_chat(comment_text_widget.master))  # Update every 1 second
+        # Clear the Text widget
+        comment_text_widget.delete("1.0", tk.END)
 
 
     def create_add_message_section(self):
@@ -98,55 +134,44 @@ class LiveChatPage(Page):
         comment_text_widget = tk.Text(add_frame, bg="#d3d3d3", height=5)
         comment_text_widget.grid(row=1, column=0, sticky="ew", padx=10)
 
+        # Character count label
+        char_count_label = tk.Label(add_frame, text=f"0/{MAX_CHAT_LENGTH}", bg="white", anchor="e")
+        char_count_label.grid(row=2, column=0, sticky="e", padx=10)
+
+        # Bind keypress events to limit and update counter
+        comment_text_widget.bind("<Key>", lambda e: self.limit_text_length(e, comment_text_widget))
+        comment_text_widget.bind("<KeyRelease>", lambda e: self.update_char_count(e, comment_text_widget, char_count_label))
+        comment_text_widget.bind("<<Paste>>", lambda e: self.handle_paste(e, comment_text_widget, char_count_label))
+
         tk.Button(
             add_frame,
             text="SEND",
             bg="#4b9c97",
             fg="white",
             command=lambda: self.add_message(comment_text_widget)
-        ).grid(row=2, column=0, sticky="e", padx=10, pady=5)
+        ).grid(row=3, column=0, sticky="e", padx=10, pady=5)
 
         return add_frame
 
 
-    def start_chat_polling(self, chat_inner):
-        if self.poll_thread is not None and self.poll_thread.is_alive():
-            return  # ✅ Prevent starting more than one thread
-
-        self.running = True
-
-        def polling_loop():
-            while self.running:
-                try:
-                    with self.lock:
-                        print(f"[Thread] Polling messages... thread id: {threading.get_ident()}")
-                        print("Fetching messages...")
-                        response = self.connected_client.send_request(ServerRequest(GET_LIVE_CHAT_MESSAGES))
-                        messages = response.messages if response.response_code == "OK" else []
-
-                    # Safely update GUI from main thread
-                    self.after(0, lambda: self.display_chat_messages(chat_inner, messages))
-
-                except Exception as e:
-                    print(f"[Polling error] {e}")
-
-                time.sleep(1)  # Safe loop delay
-
-        self.poll_thread = threading.Thread(target=polling_loop, daemon=True)
-        self.poll_thread.start()
+    def limit_text_length(self, event, text_widget):
+        content = text_widget.get("1.0", "end-1c")
+        if len(content) >= MAX_CHAT_LENGTH and event.keysym != "BackSpace":
+            return "break"
 
 
-    def display_chat_messages(self, chat_inner, messages):
-        for widget in chat_inner.winfo_children():
-            widget.destroy()
-        for message in messages:
-            tk.Label(chat_inner, text=repr(message), bg="white", anchor="w", justify="left", wraplength=780).pack(fill="x", padx=5, pady=3)
+    def update_char_count(self, event, text_widget, label):
+        content = text_widget.get("1.0", "end-1c")
+        label.config(text=f"{len(content)}/{MAX_CHAT_LENGTH}")
 
 
-    def destroy(self):
-        """Clean up resources when the page is destroyed."""
-        self.running = False
-        if self.poll_thread and self.poll_thread.is_alive():
-            self.poll_thread.join(timeout=1)
-        
-        super().destroy()  # Call the parent class's destroy method
+    def handle_paste(self, event, text_widget, char_count_label):
+        self.controller.after(1, lambda: self._trim_text(text_widget, char_count_label))  # defer to allow paste to complete
+
+
+    def _trim_text(self, text_widget, char_count_label):
+        content = text_widget.get("1.0", "end-1c")
+        if len(content) > MAX_CHAT_LENGTH:
+            text_widget.delete("1.0", "end")
+            text_widget.insert("1.0", content[:MAX_CHAT_LENGTH])
+        char_count_label.config(text=f"{min(len(content), MAX_CHAT_LENGTH)}/{MAX_CHAT_LENGTH}")
