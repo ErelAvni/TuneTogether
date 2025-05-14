@@ -23,5 +23,10 @@
         "username": "user",
         "password_hash": "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb",
         "age": "18"
+    },
+    "user2000": {
+        "username": "user2000",
+        "password_hash": "8b7abe6de73b383bc61e2085dba030cd4694435e7b0fae91b8e8a1fdd8e858a5",
+        "age": "2000"
     }
 }

@@ -44,7 +44,7 @@ class LiveChatPage(Page):
         self.create_title_section(chat_frame, chat_inner)  # Create the title section
         self.update_chat(chat_inner)  # Fetch and display the chat messages
 
-        add_message_frame = self.create_add_message_section()
+        add_message_frame = self.create_add_message_section(chat_inner)
         add_message_frame.grid(row=1, column=0, padx=10, pady=(5, 10), sticky="ew")
 
         # Bind scrolling
@@ -102,7 +102,7 @@ class LiveChatPage(Page):
         ).grid(row=0, column=1, sticky="e", padx=(10, 0))
 
 
-    def add_message(self, comment_text_widget: tk.Text):
+    def add_message(self, comment_text_widget: tk.Text, chat_inner):
         '''Adds a message to the live chat. Calls the server to send the message to all connected users.'''
         comment_text = comment_text_widget.get("1.0", tk.END).strip()
 
@@ -123,8 +123,10 @@ class LiveChatPage(Page):
         # Clear the Text widget
         comment_text_widget.delete("1.0", tk.END)
 
+        self.update_chat(chat_inner)  # Update the chat window to show the new message
 
-    def create_add_message_section(self):
+
+    def create_add_message_section(self, chat_inner):
         """Create the section for adding messages to the chat."""
         add_frame = tk.Frame(self.content_frame, bg="white", bd=1, relief='solid', padx=2, pady=2)
         add_frame.grid_columnconfigure(0, weight=1)
@@ -148,7 +150,7 @@ class LiveChatPage(Page):
             text="SEND",
             bg="#4b9c97",
             fg="white",
-            command=lambda: self.add_message(comment_text_widget)
+            command=lambda: self.add_message(comment_text_widget, chat_inner)
         ).grid(row=3, column=0, sticky="e", padx=10, pady=5)
 
         return add_frame
