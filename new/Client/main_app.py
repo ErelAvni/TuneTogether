@@ -30,7 +30,7 @@ class MainApp(tk.Tk):
         self.frames = {}
 
         # Create a Client instance
-        self.client = Client()
+        self.client = Client(host, port)
 
         try :
             self.client.connect()
