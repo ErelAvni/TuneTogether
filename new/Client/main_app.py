@@ -21,7 +21,8 @@ from tkinter import messagebox
 
 
 class MainApp(tk.Tk):
-    def __init__(self):
+    def __init__(self, host: str = '127.0.0.1', port: int = 65432):
+        """Initialize the main application window."""
         super().__init__()
         self.title("TuneTogether")
         self.geometry("1200x700")
