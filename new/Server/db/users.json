@@ -1,0 +1,37 @@
+{
+    "exampleUser": {
+        "username": "exampleUser",
+        "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbddc2f6d7eea3e5b9eac",
+        "age": 25
+    },
+    "erel": {
+        "username": "erel",
+        "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+        "age": "18"
+    },
+    "admin": {
+        "username": "admin",
+        "password_hash": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+        "age": "18"
+    },
+    "testuser": {
+        "username": "testuser",
+        "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+        "age": "18"
+    },
+    "user": {
+        "username": "user",
+        "password_hash": "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb",
+        "age": "18"
+    },
+    "user2000": {
+        "username": "user2000",
+        "password_hash": "8b7abe6de73b383bc61e2085dba030cd4694435e7b0fae91b8e8a1fdd8e858a5",
+        "age": "2000"
+    },
+    "Yuval": {
+        "username": "Yuval",
+        "password_hash": "acc539b5c96544fe89f57530fd17376553e2ea45f49ae83f686296c47de3b443",
+        "age": "26"
+    }
+}
