@@ -63,9 +63,9 @@ class Song:
     def get_star_image(self):
         """Returns the star image for the song based on the average value.
         :return: the image in a format that can be used for the button. To use it, you need to convert it to a PhotoImage object."""
-        full_star_image = Image.open("\\images\\full_star.png")  # Full star image
-        half_star_image = Image.open("\\images\\half_star.png")
-        empty_star_image = Image.open("\\images\\empty_star.png")
+        full_star_image = Image.open("images\\full_star.png")  # Full star image
+        half_star_image = Image.open("images\\half_star.png")
+        empty_star_image = Image.open("images\\empty_star.png")
 
         # Resize images to 20x20 pixels for the stars
         full_star_image = full_star_image.resize((20, 20), Image.Resampling.LANCZOS)
