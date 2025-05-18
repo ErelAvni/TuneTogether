@@ -1,11 +1,11 @@
 {
-    "Billie Jean": "new\\Client\\audio_tracks\\Billie_Jean.mp3",
-    "Echoes": "new\\Client\\audio_tracks\\Echoes.mp3",
-    "Bring Me To Life": "new\\Client\\audio_tracks\\Bring_Me_To_Life.mp3",
-    "Call Me Maybe": "new\\Client\\audio_tracks\\Call_Me_Maybe.mp3",
-    "Comfortably Numb": "new\\Client\\audio_tracks\\comfortably_numb.mp3",
-    "Lose Yourself": "new\\Client\\audio_tracks\\Lose_Yourself.mp3",
-    "Red Swan": "new\\Client\\audio_tracks\\Red_Swan.mp3",
-    "Superstition": "new\\Client\\audio_tracks\\Superstition.mp3",
-    "Three Little Birds": "new\\Client\\audio_tracks\\Three_Little_Birds.mp3"
+    "Billie Jean": "\\audio_tracks\\Billie_Jean.mp3",
+    "Echoes": "\\audio_tracks\\Echoes.mp3",
+    "Bring Me To Life": "\\audio_tracks\\Bring_Me_To_Life.mp3",
+    "Call Me Maybe": "\\audio_tracks\\Call_Me_Maybe.mp3",
+    "Comfortably Numb": "\\audio_tracks\\comfortably_numb.mp3",
+    "Lose Yourself": "\\audio_tracks\\Lose_Yourself.mp3",
+    "Red Swan": "\\audio_tracks\\Red_Swan.mp3",
+    "Superstition": "\\audio_tracks\\Superstition.mp3",
+    "Three Little Birds": "\\audio_tracks\\Three_Little_Birds.mp3"
 }
