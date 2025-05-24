@@ -47,12 +47,3 @@ class Comment:
         within the page itself.'''
 
         return f"{self.username}: \n{self.content} \n Commented at: {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
-    
-
-if __name__ == "__main__":
-    # Example usage
-    comment = Comment(username="user123", content="This is a test comment.")
-    print(comment.to_dict())
-    print(comment.to_json())
-    print(Comment.from_dict(comment.to_dict()))
-    print(comment)

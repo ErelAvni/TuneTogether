@@ -229,7 +229,6 @@ class TuneTogetherServer:
         """Adds a message to the live chat.
         """
         self.live_chat_messages.append(message)
-        print(f"Message added to live chat: {message}")
         response = ServerResponse(OK, "Message added to live chat.", LIVE_CHAT_MESSAGE)
         return response.to_json()
 
@@ -244,8 +243,6 @@ class TuneTogetherServer:
         client_response_encrypted = conn_socket.recv(2048)
         client_response_json = fernet.decrypt(client_response_encrypted).decode('utf-8')
         client_response = json.loads(client_response_json)
-        print(f"Client response: {client_response}")
-        print(f"Client response: {client_response['response_code']} - {client_response['message']}")
         if client_response["response_code"] == "OK" and client_response["message"] == "OK":
             print("Client is ready to receive chunks.")
             MAX_PER_PACKET = 10

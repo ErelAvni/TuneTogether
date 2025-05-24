@@ -12,7 +12,6 @@ class CommentPage(Page):
         super().create_top_bar(connected_client.username, song_name)  # Create the top bar with username
         
         all_comments = new.shared.DButilites.load_data_from_json(new.shared.DButilites.COMMENTS_PATH)
-        print("all comments: ", all_comments)
         song_comments = all_comments[song_name]
         self.song_name = song_name
 

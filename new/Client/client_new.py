@@ -75,13 +75,16 @@ class Client:
                     response_dict['request_code'],
                     response_dict['username'] if 'username' in response_dict else None)
                 
+                if response_dict['response_code'] == "OK" and request.request_code == "LOGOUT":
+                    self.username = None
+
                 if 'username' in response_dict:
                     self.username = response_dict['username']
 
                 if 'messages' in response_dict:
                     response.messages = [Comment.from_dict(message) for message in response_dict['messages']]
             
-                print(f"Server response (normal one): {response.response_code} - {response.message}")
+                print(f"Server response: {response.response_code} - {response.message}")
                 return response
             
             except Exception as e:
@@ -126,10 +129,6 @@ class Client:
             # Send a DISCONNECT request before closing the socket
             disconnect_request = ServerRequest("DISCONNECT", {})
             response = self.send_request(disconnect_request)
-            if response:
-                print(f"Server response to DISCONNECT: {response.response_code} - {response.message}")
-            else:
-                print("No response received for DISCONNECT request.")
         except Exception as e:
             print(f"Error sending DISCONNECT request: {e}")
         finally:

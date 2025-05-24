@@ -292,16 +292,12 @@ class MainPage(Page):
         try:
             print(f"Playing song: {song.song_name}")
             if self.current_loaded_song == None or song != self.current_loaded_song:
-                #print(f"from play_song - current_loaded_song: {self.current_loaded_song.song_name}")
-                print("Starting new song playback.")
                 self.mixer_music.load(song.song_audio_file_path)  # Load the song
                 self.mixer_music.play()
                 self.current_loaded_song = song  # Update the currently loaded song
 
             elif song == self.current_loaded_song:
                 # If the same song is already loaded, just resume playback
-                print(f"from play_song - current_loaded_song: {self.current_loaded_song.song_name}")
-                print("Resuming song playback.")
                 self.mixer_music.unpause()
                 
         except pygame.error as e:
@@ -338,8 +334,6 @@ class MainPage(Page):
             return
         try:
             self.mixer_music.pause()  # Stop the mixer
-            print(f"from pause_song - current_loaded_song: {self.current_loaded_song.song_name}")
-            print(f"Stopped song: {song.song_name}")
         except pygame.error as e:
             print(f"Error stopping song: {e}")
             messagebox.showerror("Playback Error", f"Could not stop the song: {e}")

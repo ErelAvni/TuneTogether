@@ -66,12 +66,6 @@ class LiveChatPage(Page):
 
         # Send the request to the server
         response = self.connected_client.send_request(request)
-        try:
-            print(response.to_dict())
-        except Exception as e:
-            print("debug error:", e)
-            print("debug error:", type(response))
-            pass
 
         if response.response_code == "OK":
             # Add each message to the chat window
