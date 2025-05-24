@@ -6,6 +6,7 @@ from new.Client.page import Page
 import pygame
 from new.Client.song import Song
 import new.shared.DButilites as DButilities
+import os
 
 
 class MainPage(Page):
@@ -18,8 +19,11 @@ class MainPage(Page):
         self.current_loaded_song = None  # Track the currently loaded song
         self.song_boxes = {}  # song_name: song_box_frame mapping
 
-        self.full_star_image = Image.open("images\\full_star.png").resize((20, 20), Image.Resampling.LANCZOS)
-        self.empty_star_image = Image.open("images\\empty_star.png").resize((20, 20), Image.Resampling.LANCZOS)
+        images_path = os.path.join(os.path.dirname(__file__), "images")
+        self.images_abs_path = os.path.abspath(images_path)
+
+        self.full_star_image = Image.open(os.path.join(self.images_abs_path, "full_star.png")).resize((20, 20), Image.Resampling.LANCZOS)
+        self.empty_star_image = Image.open(os.path.join(self.images_abs_path, "empty_star.png")).resize((20, 20), Image.Resampling.LANCZOS)
         self.full_star_tk = ImageTk.PhotoImage(self.full_star_image)
         self.empty_star_tk = ImageTk.PhotoImage(self.empty_star_image)
 
@@ -145,7 +149,7 @@ class MainPage(Page):
             print(f"Error loading user star rating: {e}")
 
         # Load the play button image
-        play_image_path = "images\\play_icon.png"
+        play_image_path = os.path.join(self.images_abs_path, "play_icon.png")
         try:
             play_image = Image.open(play_image_path).resize((32, 32))
             play_image_tk = ImageTk.PhotoImage(play_image)
@@ -181,13 +185,6 @@ class MainPage(Page):
 
     def display_user_star_rating(self, parent_frame, song: Song):
         selected_rating = tk.IntVar(value=song.all_ratings.get(self.username, 0))
-
-        # --- Load images ---
-        full_star_img = Image.open("images\\full_star.png").resize((20, 20))
-        empty_star_img = Image.open("images\\empty_star.png").resize((20, 20))
-
-        self.full_star_tk = ImageTk.PhotoImage(full_star_img)
-        self.empty_star_tk = ImageTk.PhotoImage(empty_star_img)
 
         # --- Average Rating Display ---
         avg_star_img = song.get_star_image().resize((100, 20))  # match display size
@@ -274,7 +271,7 @@ class MainPage(Page):
 
     def update_button_to_play(self, box_frame):
         """Update the play button in the song box to the play state."""
-        play_image_path = "images\\play_icon.png"
+        play_image_path = os.path.join(self.images_abs_path, "play_icon.png")
         try:
             play_image = Image.open(play_image_path).resize((32, 32))
             play_image_tk = ImageTk.PhotoImage(play_image)
@@ -318,7 +315,7 @@ class MainPage(Page):
 
     def update_button_to_stop(self, box_frame):
         """Update the play button in the song box to the stop state."""
-        stop_image_path = "images\\stop_icon.png"
+        stop_image_path = os.path.join(self.images_abs_path, "stop_icon.png")
         try:
             stop_image = Image.open(stop_image_path).resize((32, 32))
             stop_image_tk = ImageTk.PhotoImage(stop_image)

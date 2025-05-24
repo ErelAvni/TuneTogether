@@ -3,11 +3,28 @@ import os
 
 #CONSTS
 BASE_PATH = os.path.dirname(__file__).replace("\\", "/")
-BASE_PATH = os.path.abspath(os.path.join(BASE_PATH, ".."))  # Adjust the path to your project root
+BASE_PATH = os.path.abspath(os.path.join(BASE_PATH, ".."))
 USER_DB_PATH = os.path.join(BASE_PATH, "Server", "db", "users.json").replace("\\", "/")
 SONG_PATHS_PATH = os.path.join(BASE_PATH, "Client", "db", "song_paths.json").replace("\\", "/")
 COMMENTS_PATH = os.path.join(BASE_PATH, "Client", "db", "comments.json").replace("\\", "/")
 SONG_RATINGS_PATH = os.path.join(BASE_PATH, "Client", "db", "song_ratings.json").replace("\\", "/")
+
+
+def load_song_paths():
+    """
+    Loads the song paths from the JSON file.
+    Returns a dictionary with song names as keys and their paths as values.
+    """    
+    with open(SONG_PATHS_PATH, 'r') as file:
+        raw_data = file.read()
+        data = json.loads(raw_data)
+
+    # add the absolute path to each song and traverse to Client directory
+    for song_name, song_path in data.items():
+        song_path = os.path.join(BASE_PATH, "Client", song_path)
+        data[song_name] = os.path.abspath(song_path).replace("\\", "/")
+    
+    return data
 
 
 def load_data_from_json(full_path: str):
@@ -15,6 +32,9 @@ def load_data_from_json(full_path: str):
         print("The file does not exist. Returning empty dict.")
         return {}
     
+    if full_path == SONG_PATHS_PATH:
+        return load_song_paths()
+
     with open(full_path, 'r') as file:
         raw_data = file.read()
         data = json.loads(raw_data)

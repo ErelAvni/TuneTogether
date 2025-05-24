@@ -1,10 +1,10 @@
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
 import os, sys
 
 # Load environment variables from .env file
 here = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(here, "..", ".."))  # Adjust the path to your project root
-load_dotenv(os.path.join(project_root, ".env"))
+load_dotenv(os.path.join(project_root, "new", ".env"))
 
 if project_root not in sys.path:
     sys.path.append(project_root)
@@ -26,7 +26,7 @@ from cryptography.fernet import Fernet
 import time
 
 
-YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
+YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 YOUTUBE = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
 
