@@ -32,8 +32,6 @@ class Song:
         self.song_name = song_name
 
         self.song_ratings = song_ratings
-        print(f"Song ratings for {self.song_name}: {self.song_ratings}")
-        print(f"Song {self.song_name} initialized.")
 
         self.star_image = self.get_star_image()
 
@@ -88,7 +86,7 @@ class Song:
         full_star_image = full_star_image.resize((20, 20), Image.Resampling.LANCZOS)
         half_star_image = half_star_image.resize((20, 20), Image.Resampling.LANCZOS)
         empty_star_image = empty_star_image.resize((20, 20), Image.Resampling.LANCZOS)
-        print(f"Average stars for {self.song_name}: {self.average_stars}")
+
         full_stars = int(self.average_stars)  # Number of full stars
         half_stars = 0  # Number of half stars
         if self.average_stars % 1 >= 0.5:

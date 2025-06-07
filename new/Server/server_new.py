@@ -153,7 +153,6 @@ class TuneTogetherServer:
     def login_user(self, username: str, password_hash: str):
         """Handles the login request from the client."""
         users = DButilites.load_data_from_json(DButilites.USER_DB_PATH)
-        print(DButilites.USER_DB_PATH)
 
         if username not in users:
             response = ServerResponse(DATA_NOT_FOUND, f"User {username} not found.", LOGIN)
@@ -312,7 +311,6 @@ class TuneTogetherServer:
                 chunk_response = ServerResponse(OK, "CHUNK", GET_COMMENTS, messages=chunk)
                 print(f"Sending chunk: {chunk_response}")
                 conn_socket.send(fernet.encrypt(chunk_response.to_json().encode('utf-8')))
-                print("sent chunk")
                 time.sleep(0.05)  # Optional: avoid packet merging
 
             # Final DONE message
@@ -322,7 +320,6 @@ class TuneTogetherServer:
 
     def get_all_song_ratings(self, song_name: str):
         """Returns all song ratings from the database."""
-        print(f"Getting all ratings for song: {song_name}")
         all_ratings = DButilites.load_data_from_json(DButilites.SONG_RATINGS_PATH)[song_name]
         response = ServerResponse(OK, "All song ratings retrieved.", GET_ALL_SONG_RATINGS, song_ratings=all_ratings)
         return response.to_json()

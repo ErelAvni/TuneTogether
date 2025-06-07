@@ -26,7 +26,7 @@
         "user": 5,
         "user2000": 5,
         "Yuval": 5,
-        "ori": 3
+        "ori": 4
     },
     "Call Me Maybe": {
         "exampleUser": 2,
@@ -44,7 +44,7 @@
         "testuser": 4,
         "user": 5,
         "user2000": 5,
-        "ori": 5
+        "ori": 1
     },
     "Lose Yourself": {
         "exampleUser": 5,
@@ -78,7 +78,7 @@
         "erel": 5,
         "admin": 2,
         "testuser": 5,
-        "user": 5,
+        "user": 2,
         "user2000": 2,
         "ori": 1
     }
