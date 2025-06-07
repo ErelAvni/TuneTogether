@@ -80,6 +80,6 @@ class MainApp(tk.Tk):
 
 
 if __name__ == "__main__":
-    app = MainApp()
+    app = MainApp('192.168.1.142')
     app.protocol("WM_DELETE_WINDOW", app.on_close)  # Handle window close event
     app.mainloop()

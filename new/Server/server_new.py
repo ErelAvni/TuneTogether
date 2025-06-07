@@ -261,7 +261,7 @@ class TuneTogetherServer:
 
 def main():
     # pass ip and port as arguments, otehrwise using localhost and 65432
-    server = TuneTogetherServer()
+    server = TuneTogetherServer('192.168.1.142', 65432) 
     server.start()
 
 
