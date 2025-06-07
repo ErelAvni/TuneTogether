@@ -7,7 +7,7 @@ import pygame
 from new.Client.song import Song
 import new.shared.DButilites as DButilities
 import os
-from new.shared.server_request_new import ServerRequest, GET_ALL_SONG_RATINGS
+from new.shared.server_request_new import ServerRequest, GET_ALL_SONG_RATINGS, UPDATE_SONG_RATING
 
 
 class MainPage(Page):
@@ -215,8 +215,11 @@ class MainPage(Page):
             db_data[song.song_name][self.username] = rating
             DButilities.update_data_to_json(db_data, DButilities.SONG_RATINGS_PATH, manual_update=True)
 
+            request = ServerRequest(UPDATE_SONG_RATING, {"song_name": song.song_name, "username": self.username, "rating": rating})
+            response = self.connected_client.send_request(request)
+
             # Update song.all_ratings and refresh average
-            song.song_ratings[self.username] = rating
+            song.song_ratings = response.song_ratings if response.song_ratings else {}
 
             # Refresh average image
             new_avg_image = song.get_star_image().resize((100, 20))

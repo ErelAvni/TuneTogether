@@ -120,6 +120,9 @@ class TuneTogetherServer:
                     elif request.request_code == "GET_ALL_SONG_RATINGS":
                         response_json = self.get_all_song_ratings(request.payload['song_name'])
                     
+                    elif request.request_code == "UPDATE_SONG_RATING":
+                        response_json = self.update_song_rating(request.payload['song_name'], request.payload['username'], request.payload['rating'])
+
                     else:
                         response = ServerResponse(INVALID_REQUEST, "Invalid request code.")
                         response_json = response.to_json()
@@ -322,6 +325,19 @@ class TuneTogetherServer:
         print(f"Getting all ratings for song: {song_name}")
         all_ratings = DButilites.load_data_from_json(DButilites.SONG_RATINGS_PATH)[song_name]
         response = ServerResponse(OK, "All song ratings retrieved.", GET_ALL_SONG_RATINGS, song_ratings=all_ratings)
+        return response.to_json()
+
+
+    def update_song_rating(self, song_name: str, username: str, rating: int):
+        """Updates the rating for a song by a user."""
+        all_ratings = DButilites.load_data_from_json(DButilites.SONG_RATINGS_PATH)
+        if song_name not in all_ratings:
+            all_ratings[song_name] = {}
+        all_ratings[song_name][username] = rating
+        if DButilites.update_data_to_json(all_ratings, DButilites.SONG_RATINGS_PATH, manual_update=True):
+            response = ServerResponse(OK, "Song rating updated successfully.", "UPDATE_SONG_RATING")
+        else:
+            response = ServerResponse(INTERNAL_ERROR, "Error updating song rating.", "UPDATE_SONG_RATING")
         return response.to_json()
 
 
