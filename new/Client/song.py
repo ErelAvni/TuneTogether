@@ -31,7 +31,7 @@ class Song:
         '''
         self.song_name = song_name
 
-        self.song_ratings = song_ratings[self.song_name] if song_ratings and self.song_name in song_ratings else None
+        self.song_ratings = song_ratings
         print(f"Song {self.song_name} initialized.")
 
         self.star_image = self.get_star_image()

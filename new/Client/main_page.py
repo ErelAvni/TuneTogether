@@ -68,7 +68,11 @@ class MainPage(Page):
             for song_name in song_names:
                 # Create a Song object for each song
                 request = ServerRequest(GET_ALL_SONG_RATINGS, {"song_name": song_name})
-                song_ratings = self.connected_client.send_request(request)
+                response = self.connected_client.send_request(request)
+                if response.response_code != "OK":
+                    print(f"Error fetching song ratings for {song_name}: {response.message}")
+                    continue
+                song_ratings = response.song_ratings if response.song_ratings else {}
                 song = Song(song_name, song_ratings)
                 self.song_dict[song_name] = song  # Store the song object in a dictionary
 
