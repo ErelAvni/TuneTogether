@@ -6,8 +6,8 @@ BASE_PATH = os.path.dirname(__file__).replace("\\", "/")
 BASE_PATH = os.path.abspath(os.path.join(BASE_PATH, ".."))
 USER_DB_PATH = os.path.join(BASE_PATH, "Server", "db", "users.json").replace("\\", "/")
 COMMENTS_PATH = os.path.join(BASE_PATH, "Server", "db", "comments.json").replace("\\", "/")
+SONG_RATINGS_PATH = os.path.join(BASE_PATH, "Server", "db", "song_ratings.json").replace("\\", "/")
 SONG_PATHS_PATH = os.path.join(BASE_PATH, "Client", "db", "song_paths.json").replace("\\", "/")
-SONG_RATINGS_PATH = os.path.join(BASE_PATH, "Client", "db", "song_ratings.json").replace("\\", "/")
 
 
 def load_song_paths():

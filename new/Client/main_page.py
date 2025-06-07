@@ -7,6 +7,7 @@ import pygame
 from new.Client.song import Song
 import new.shared.DButilites as DButilities
 import os
+from new.shared.server_request_new import ServerRequest, GET_ALL_SONG_RATINGS
 
 
 class MainPage(Page):
@@ -61,18 +62,16 @@ class MainPage(Page):
         # Example song list
         print("Creating grid")
         try:
-            self.song_dict = {
-                "Comfortably Numb" : Song("Comfortably Numb"),
-                "Billie Jean" : Song("Billie Jean"),
-                "Echoes" : Song("Echoes"),
-                "Call Me Maybe" : Song("Call Me Maybe"),
-                "Bring Me To Life" : Song("Bring Me To Life"),
-                "Lose Yourself" : Song("Lose Yourself"),
-                "Superstition" : Song("Superstition"),
-                "Red Swang" : Song("Red Swan"),
-                "Superstition" : Song("Superstition"),
-                "Three Little Birds" : Song("Three Little Birds"),   
-            }
+            self.song_dict = {}
+            song_names = ["Comfortably Numb", "Billie Jean", "Echoes", "Bring Me To Life", "Call Me Maybe", "Lose Yourself", "Red Swan", "Superstition", "Three Little Birds"]
+
+            for song_name in song_names:
+                # Create a Song object for each song
+                request = ServerRequest(GET_ALL_SONG_RATINGS, {"song_name": song_name})
+                song_ratings = self.connected_client.send_request(request)
+                song = Song(song_name, song_ratings)
+                self.song_dict[song_name] = song  # Store the song object in a dictionary
+
             # --- Canvas dimensions (smaller than window) ---
             canvas_width = 850
             canvas_height = 400
@@ -184,7 +183,7 @@ class MainPage(Page):
 
 
     def display_user_star_rating(self, parent_frame, song: Song):
-        selected_rating = tk.IntVar(value=song.all_ratings.get(self.username, 0))
+        selected_rating = tk.IntVar(value=song.song_ratings.get(self.username, 0))
 
         # --- Average Rating Display ---
         avg_star_img = song.get_star_image().resize((100, 20))  # match display size
@@ -212,7 +211,7 @@ class MainPage(Page):
             DButilities.update_data_to_json(db_data, DButilities.SONG_RATINGS_PATH, manual_update=True)
 
             # Update song.all_ratings and refresh average
-            song.all_ratings[self.username] = rating
+            song.song_ratings[self.username] = rating
 
             # Refresh average image
             new_avg_image = song.get_star_image().resize((100, 20))

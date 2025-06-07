@@ -24,13 +24,14 @@ youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
 
 class Song:
-    def __init__(self, song_name: str, song_average_stars: int = 5):
+    def __init__(self, song_name: str, song_ratings: dict = None):
         '''Initializes a song object. Will work only for songs that are in the database.
         :param song_name: the name of the song. Needs to be in \"Some Song Name\" format.
+        :param all_ratings: a dict of the ratings for this song alone. If not provided, it means that there is no need for the star system and the average stars will be set to 0.
         '''
         self.song_name = song_name
 
-        self.all_ratings = DButilities.load_data_from_json(DButilities.SONG_RATINGS_PATH)[song_name]
+        self.song_ratings = song_ratings[self.song_name] if song_ratings and self.song_name in song_ratings else None
         print(f"Song {self.song_name} initialized.")
 
         self.star_image = self.get_star_image()
@@ -57,7 +58,9 @@ class Song:
     
     @property
     def average_stars(self):
-        return sum(self.all_ratings.values()) / len(self.all_ratings) if self.all_ratings else 0
+        if not self.song_ratings:
+            return 0
+        return sum(self.song_ratings.values()) / len(self.song_ratings) if self.song_ratings else 0
     
 
     def get_star_image(self):

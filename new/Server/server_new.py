@@ -13,7 +13,7 @@ if project_root not in sys.path:
 import socket
 import threading
 import json
-from new.shared.server_request_new import ServerRequest, LOGIN, REGISTER, LOGOUT, DISCONNECT, GET_LIVE_CHAT_MESSAGES, LIVE_CHAT_MESSAGE, ADD_COMMENT, GET_COMMENTS
+from new.shared.server_request_new import ServerRequest, LOGIN, REGISTER, LOGOUT, DISCONNECT, GET_LIVE_CHAT_MESSAGES, LIVE_CHAT_MESSAGE, ADD_COMMENT, GET_COMMENTS, GET_ALL_SONG_RATINGS
 import new.shared.DButilites as DButilites
 from new.shared.server_response import ServerResponse, OK, DATA_NOT_FOUND, UNAUTHORIZED, INVALID_REQUEST, INVALID_DATA, INTERNAL_ERROR
 from new.shared.comment import Comment
@@ -116,6 +116,10 @@ class TuneTogetherServer:
 
                     elif request.request_code == "GET_COMMENTS":
                         response_json = self.get_comments_for_song(request.payload['song_name'], conn_socket, fernet)
+                    
+                    elif request.request_code == "GET_ALL_SONG_RATINGS":
+                        response_json = self.get_all_song_ratings(request.payload['song_name'])
+                    
                     else:
                         response = ServerResponse(INVALID_REQUEST, "Invalid request code.")
                         response_json = response.to_json()
@@ -311,6 +315,13 @@ class TuneTogetherServer:
             # Final DONE message
             done_response = ServerResponse(OK, "DONE", GET_COMMENTS)
             return done_response.to_json()
+
+
+    def get_all_song_ratings(self, song_name: str):
+        """Returns all song ratings from the database."""
+        all_ratings = DButilites.load_data_from_json(DButilites.SONG_RATINGS_PATH)[song_name]
+        response = ServerResponse(OK, "All song ratings retrieved.", GET_ALL_SONG_RATINGS, payload=all_ratings)
+        return response.to_json()
 
 
 def main():
