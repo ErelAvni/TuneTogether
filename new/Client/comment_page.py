@@ -5,7 +5,7 @@ from new.shared.comment import Comment
 from new.Client.song import Song
 import new.shared.DButilites
 from tkinter import messagebox
-from new.shared.server_request_new import ServerRequest, ADD_COMMENT
+from new.shared.server_request_new import ServerRequest, ADD_COMMENT, GET_COMMENTS
 
 
 class CommentPage(Page):
@@ -13,8 +13,9 @@ class CommentPage(Page):
         super().__init__(parent, controller, connected_client, bg_param="#95DBCD")
         super().create_top_bar(connected_client.username, song_name)  # Create the top bar with username
         
-        all_comments = new.shared.DButilites.load_data_from_json(new.shared.DButilites.COMMENTS_PATH)
-        song_comments = all_comments[song_name]
+        request = ServerRequest(GET_COMMENTS, {"song_name": song_name})
+
+        song_comments = self.connected_client.send_request(request).messages
         self.song_name = song_name
 
         # Title Label

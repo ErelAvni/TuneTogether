@@ -13,7 +13,7 @@ if project_root not in sys.path:
 import socket
 import threading
 import json
-from new.shared.server_request_new import ServerRequest, LOGIN, REGISTER, LOGOUT, DISCONNECT, GET_LIVE_CHAT_MESSAGES, LIVE_CHAT_MESSAGE, ADD_COMMENT
+from new.shared.server_request_new import ServerRequest, LOGIN, REGISTER, LOGOUT, DISCONNECT, GET_LIVE_CHAT_MESSAGES, LIVE_CHAT_MESSAGE, ADD_COMMENT, GET_COMMENTS
 import new.shared.DButilites as DButilites
 from new.shared.server_response import ServerResponse, OK, DATA_NOT_FOUND, UNAUTHORIZED, INVALID_REQUEST, INVALID_DATA, INTERNAL_ERROR
 from new.shared.comment import Comment
@@ -114,6 +114,8 @@ class TuneTogetherServer:
                     elif request.request_code == ADD_COMMENT:
                         response_json = self.add_comment_to_comment_db(Comment.from_dict(request.payload['comment']), request.payload['song_name'])
 
+                    elif request.request_code == "GET_COMMENTS":
+                        response_json = self.get_comments_for_song(request.payload['song_name'])
                     else:
                         response = ServerResponse(INVALID_REQUEST, "Invalid request code.")
                         response_json = response.to_json()
@@ -276,6 +278,18 @@ class TuneTogetherServer:
 
         response = ServerResponse(OK, "Comment added successfully.", ADD_COMMENT)
         return response.to_json()
+
+
+    def get_comments_for_song(self, song_name: str):
+        """Returns all comments for a given song."""
+        if not song_name:
+            response = ServerResponse(INVALID_DATA, "Comment or song name is missing.", GET_COMMENTS)
+            return response.to_json()
+        
+        all_comments = DButilites.load_data_from_json(DButilites.COMMENTS_PATH)
+        song_comments = all_comments[song_name]
+        response = ServerResponse(OK, "Comments retrieved successfully.", GET_COMMENTS, messages=song_comments)
+        return song_comments
 
 
 def main():
