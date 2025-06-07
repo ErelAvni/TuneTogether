@@ -15,7 +15,7 @@ class CommentPage(Page):
         
         request = ServerRequest(GET_COMMENTS, {"song_name": song_name})
 
-        song_comments = self.connected_client.send_request(request).messages
+        song_comments = self.connected_client.send_request(request)
         self.song_name = song_name
 
         # Title Label
