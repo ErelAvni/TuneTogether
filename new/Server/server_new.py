@@ -115,7 +115,7 @@ class TuneTogetherServer:
                         response_json = self.add_comment_to_comment_db(Comment.from_dict(request.payload['comment']), request.payload['song_name'])
 
                     elif request.request_code == "GET_COMMENTS":
-                        response_json = self.get_comments_for_song(request.payload['song_name'])
+                        response_json = self.get_comments_for_song(request.payload['song_name'], conn_socket, fernet)
                     else:
                         response = ServerResponse(INVALID_REQUEST, "Invalid request code.")
                         response_json = response.to_json()
@@ -280,16 +280,34 @@ class TuneTogetherServer:
         return response.to_json()
 
 
-    def get_comments_for_song(self, song_name: str):
+    def get_comments_for_song(self, song_name: str, conn_socket, fernet):
         """Returns all comments for a given song."""
         if not song_name:
-            response = ServerResponse(INVALID_DATA, "Comment or song name is missing.", GET_COMMENTS)
+            response = ServerResponse(INVALID_DATA, "song name is missing.", GET_COMMENTS)
             return response.to_json()
         
-        all_comments = DButilites.load_data_from_json(DButilites.COMMENTS_PATH)
-        song_comments = all_comments[song_name]
-        response = ServerResponse(OK, "Comments retrieved successfully.", GET_COMMENTS, messages=song_comments)
-        return song_comments
+        all_messages = DButilites.load_data_from_json(DButilites.COMMENTS_PATH)[song_name]
+        response = ServerResponse(OK, "Ready to send chunks", GET_LIVE_CHAT_MESSAGES)
+        conn_socket.send(fernet.encrypt(response.to_json().encode('utf-8')))
+
+        # Wait for client's OK before proceeding
+        client_response_encrypted = conn_socket.recv(2048)
+        client_response_json = fernet.decrypt(client_response_encrypted).decode('utf-8')
+        client_response = json.loads(client_response_json)
+        if client_response["response_code"] == "OK" and client_response["message"] == "OK":
+            print("Client is ready to receive chunks.")
+            MAX_PER_PACKET = 10
+
+            for i in range(0, len(all_messages), MAX_PER_PACKET):
+                chunk = all_messages[i:i + MAX_PER_PACKET]
+                chunk_response = ServerResponse(OK, "CHUNK", GET_LIVE_CHAT_MESSAGES, messages=chunk)
+                print(f"Sending chunk: {chunk_response.to_dict()}")
+                conn_socket.send(fernet.encrypt(chunk_response.to_json().encode('utf-8')))
+                time.sleep(0.05)  # Optional: avoid packet merging
+
+            # Final DONE message
+            done_response = ServerResponse(OK, "DONE", GET_LIVE_CHAT_MESSAGES)
+            return done_response.to_json()
 
 
 def main():
