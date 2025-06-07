@@ -70,10 +70,8 @@ class MainPage(Page):
                 request = ServerRequest(GET_ALL_SONG_RATINGS, {"song_name": song_name})
                 response = self.connected_client.send_request(request)
                 if response.response_code != "OK":
-                    print(f"Error fetching song ratings for {song_name}: {response.message}")
                     continue
                 song_ratings = response.song_ratings if response.song_ratings else {}
-                print(response.to_dict())
                 song = Song(song_name, song_ratings)
                 self.song_dict[song_name] = song  # Store the song object in a dictionary
 
@@ -208,19 +206,12 @@ class MainPage(Page):
                 img = self.full_star_tk if i < rating else self.empty_star_tk
                 btn.config(image=img)
 
-            # Update in-memory and save to file
-            db_data = DButilities.load_data_from_json(DButilities.SONG_RATINGS_PATH)
-            if song.song_name not in db_data:
-                db_data[song.song_name] = {}
-            db_data[song.song_name][self.username] = rating
-            DButilities.update_data_to_json(db_data, DButilities.SONG_RATINGS_PATH, manual_update=True)
-
             request = ServerRequest(UPDATE_SONG_RATING, {"song_name": song.song_name, "username": self.username, "rating": rating})
+            self.connected_client.send_request(request)
+            request = ServerRequest(GET_ALL_SONG_RATINGS, {"song_name": song.song_name})
             response = self.connected_client.send_request(request)
-
-            # Update song.all_ratings and refresh average
+            # Update song all_ratings and refresh average
             song.update_song_ratings(response.song_ratings)
-
             # Refresh average image
             new_avg_image = song.get_star_image().resize((100, 20))
             new_avg_tk = ImageTk.PhotoImage(new_avg_image)

@@ -4,7 +4,7 @@
         "erel": 4,
         "admin": 3,
         "testuser": 4,
-        "user": 3,
+        "user": 4,
         "user2000": 3,
         "Yuval": 5,
         "ori": 5
@@ -25,15 +25,17 @@
         "testuser": 3,
         "user": 5,
         "user2000": 5,
-        "Yuval": 5
+        "Yuval": 5,
+        "ori": 3
     },
     "Call Me Maybe": {
         "exampleUser": 2,
         "erel": 2,
         "admin": 2,
         "testuser": 2,
-        "user": 3,
-        "user2000": 4
+        "user": 5,
+        "user2000": 4,
+        "ori": 2
     },
     "Comfortably Numb": {
         "exampleUser": 4,
@@ -42,7 +44,7 @@
         "testuser": 4,
         "user": 5,
         "user2000": 5,
-        "ori": 1
+        "ori": 5
     },
     "Lose Yourself": {
         "exampleUser": 5,
@@ -50,7 +52,8 @@
         "admin": 5,
         "testuser": 5,
         "user": 3,
-        "user2000": 3
+        "user2000": 3,
+        "ori": 1
     },
     "Red Swan": {
         "exampleUser": 3,
@@ -58,7 +61,8 @@
         "admin": 5,
         "testuser": 3,
         "user": 5,
-        "user2000": 5
+        "user2000": 5,
+        "ori": 5
     },
     "Superstition": {
         "exampleUser": 4,
@@ -66,14 +70,16 @@
         "admin": 1,
         "testuser": 4,
         "user": 2,
-        "user2000": 4
+        "user2000": 4,
+        "ori": 1
     },
     "Three Little Birds": {
         "exampleUser": 5,
         "erel": 5,
         "admin": 2,
         "testuser": 5,
-        "user": 2,
-        "user2000": 2
+        "user": 5,
+        "user2000": 2,
+        "ori": 1
     }
 }

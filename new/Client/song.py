@@ -71,7 +71,7 @@ class Song:
         if not self.song_ratings:
             self.song_ratings = {}
         
-        self.song_ratings = new_ratings
+        self.song_ratings.update(new_ratings)  # Update the existing ratings with new ones
 
 
     def get_star_image(self):
@@ -88,7 +88,7 @@ class Song:
         full_star_image = full_star_image.resize((20, 20), Image.Resampling.LANCZOS)
         half_star_image = half_star_image.resize((20, 20), Image.Resampling.LANCZOS)
         empty_star_image = empty_star_image.resize((20, 20), Image.Resampling.LANCZOS)
-
+        print(f"Average stars for {self.song_name}: {self.average_stars}")
         full_stars = int(self.average_stars)  # Number of full stars
         half_stars = 0  # Number of half stars
         if self.average_stars % 1 >= 0.5:
