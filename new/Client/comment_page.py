@@ -16,6 +16,7 @@ class CommentPage(Page):
         request = ServerRequest(GET_COMMENTS, {"song_name": song_name})
 
         song_comments = self.connected_client.send_request(request)
+        song_comments = song_comments.messages if song_comments.response_code == "OK" else ["an error occurred while fetching comments."]
         self.song_name = song_name
 
         # Title Label
