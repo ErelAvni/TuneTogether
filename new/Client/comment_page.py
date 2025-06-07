@@ -124,7 +124,7 @@ class CommentPage(Page):
             "song_name": self.song_name
         })
         
-        response = self.client.send_request(request)
+        response = self.connected_client.send_request(request)
 
         if response.response_code == "OK":
             messagebox.showinfo("Success", "Comment added successfully.")
