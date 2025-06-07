@@ -270,7 +270,7 @@ class TuneTogetherServer:
             return response.to_json()
         
         all_comments = DButilites.load_data_from_json(DButilites.COMMENTS_PATH)
-        song_comments = all_comments[comment.song_name]
+        song_comments = all_comments[song_name]
         song_comments.append(comment.to_dict())
         DButilites.update_data_to_json(all_comments, DButilites.COMMENTS_PATH, manual_update=True)
 
