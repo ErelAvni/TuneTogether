@@ -319,8 +319,9 @@ class TuneTogetherServer:
 
     def get_all_song_ratings(self, song_name: str):
         """Returns all song ratings from the database."""
+        print(f"Getting all ratings for song: {song_name}")
         all_ratings = DButilites.load_data_from_json(DButilites.SONG_RATINGS_PATH)[song_name]
-        response = ServerResponse(OK, "All song ratings retrieved.", GET_ALL_SONG_RATINGS, payload=all_ratings)
+        response = ServerResponse(OK, "All song ratings retrieved.", GET_ALL_SONG_RATINGS, song_ratings=all_ratings)
         return response.to_json()
 
 
