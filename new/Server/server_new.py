@@ -300,13 +300,13 @@ class TuneTogetherServer:
 
             for i in range(0, len(all_messages), MAX_PER_PACKET):
                 chunk = all_messages[i:i + MAX_PER_PACKET]
-                chunk_response = ServerResponse(OK, "CHUNK", GET_LIVE_CHAT_MESSAGES, messages=chunk)
+                chunk_response = ServerResponse(OK, "CHUNK", GET_COMMENTS, messages=chunk)
                 print(f"Sending chunk: {chunk_response.to_dict()}")
                 conn_socket.send(fernet.encrypt(chunk_response.to_json().encode('utf-8')))
                 time.sleep(0.05)  # Optional: avoid packet merging
 
             # Final DONE message
-            done_response = ServerResponse(OK, "DONE", GET_LIVE_CHAT_MESSAGES)
+            done_response = ServerResponse(OK, "DONE", GET_COMMENTS)
             return done_response.to_json()
 
 
