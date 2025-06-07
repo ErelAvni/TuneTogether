@@ -93,10 +93,7 @@ class CommentPage(Page):
         tt_inner = tk.Frame(tt_canvas, bg="white")
         tt_canvas.create_window((0, 0), window=tt_inner, anchor='nw')
 
-        for comment_dict in song_comments:
-            print(comment_dict)
-            print(isinstance(comment_dict, dict))
-            comment = Comment.from_dict(comment_dict)
+        for comment in song_comments:
             text = comment.__repr__()
             tk.Label(tt_inner, text=text, bg="#d3d3d3", anchor="w", justify="left", wraplength=180).pack(fill="x", padx=5, pady=3)
 

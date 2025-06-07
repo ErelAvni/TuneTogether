@@ -300,10 +300,11 @@ class TuneTogetherServer:
 
             for i in range(0, len(all_messages), MAX_PER_PACKET):
                 chunk = all_messages[i:i + MAX_PER_PACKET]
+                for j in range(len(chunk)):
+                    chunk[j] = Comment.from_dict(chunk[j])
                 chunk_response = ServerResponse(OK, "CHUNK", GET_COMMENTS, messages=chunk)
-                print("here")
                 print(f"Sending chunk: {chunk_response}")
-                conn_socket.send(fernet.encrypt(json.dumps(chunk_response).encode('utf-8')))
+                conn_socket.send(fernet.encrypt(chunk_response.to_json().encode('utf-8')))
                 print("sent chunk")
                 time.sleep(0.05)  # Optional: avoid packet merging
 
