@@ -32,6 +32,7 @@ class Song:
         self.song_name = song_name
 
         self.song_ratings = song_ratings
+        print(f"Song ratings for {self.song_name}: {self.song_ratings}")
         print(f"Song {self.song_name} initialized.")
 
         self.star_image = self.get_star_image()
@@ -60,7 +61,7 @@ class Song:
     def average_stars(self):
         if not self.song_ratings:
             return 0
-        return sum(self.song_ratings.values()) / len(self.song_ratings) if self.song_ratings else 0
+        return sum(self.song_ratings.values()) / len(self.song_ratings)
     
 
     def get_star_image(self):

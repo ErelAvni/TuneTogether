@@ -73,7 +73,10 @@ class Client:
                     response_dict['response_code'], 
                     response_dict['message'], 
                     response_dict['request_code'],
-                    response_dict['username'] if 'username' in response_dict else None)
+                    response_dict['username'] if 'username' in response_dict else None,
+                    song_ratings=response_dict['song_ratings'] if 'song_ratings' in response_dict else None,
+                    )
+                    
                 
                 if response_dict['response_code'] == "OK" and request.request_code == "LOGOUT":
                     self.username = None

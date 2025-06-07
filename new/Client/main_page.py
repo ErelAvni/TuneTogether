@@ -73,6 +73,7 @@ class MainPage(Page):
                     print(f"Error fetching song ratings for {song_name}: {response.message}")
                     continue
                 song_ratings = response.song_ratings if response.song_ratings else {}
+                print(response.to_dict())
                 song = Song(song_name, song_ratings)
                 self.song_dict[song_name] = song  # Store the song object in a dictionary
 
