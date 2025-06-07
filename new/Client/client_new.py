@@ -66,7 +66,7 @@ class Client:
                     print(f"Request code mismatch: {response_dict['request_code']} != {request.request_code}")
                     raise Exception(f"Expected response for {request.request_code}, but got {response_dict['request_code']}")
 
-                if request.request_code == "GET_LIVE_CHAT_MESSAGES" and response_dict["message"] == "Ready to send chunks":
+                if (request.request_code == "GET_LIVE_CHAT_MESSAGES" or request.request_code == "GET_COMMENTS") and response_dict["message"] == "Ready to send chunks":
                     return self._receive_message_chunks()
 
                 response = ServerResponse(
