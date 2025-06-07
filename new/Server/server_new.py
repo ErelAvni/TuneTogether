@@ -303,7 +303,7 @@ class TuneTogetherServer:
                 chunk_response = ServerResponse(OK, "CHUNK", GET_COMMENTS, messages=chunk)
                 print("here")
                 print(f"Sending chunk: {chunk_response}")
-                conn_socket.send(fernet.encrypt(chunk_response.to_json().encode('utf-8')))
+                conn_socket.send(fernet.encrypt(json.dumps(chunk_response).encode('utf-8')))
                 print("sent chunk")
                 time.sleep(0.05)  # Optional: avoid packet merging
 
