@@ -287,7 +287,7 @@ class TuneTogetherServer:
             return response.to_json()
         
         all_messages = DButilites.load_data_from_json(DButilites.COMMENTS_PATH)[song_name]
-        response = ServerResponse(OK, "Ready to send chunks", GET_LIVE_CHAT_MESSAGES)
+        response = ServerResponse(OK, "Ready to send chunks", GET_COMMENTS)
         conn_socket.send(fernet.encrypt(response.to_json().encode('utf-8')))
 
         # Wait for client's OK before proceeding
