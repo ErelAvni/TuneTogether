@@ -64,6 +64,16 @@ class Song:
         return sum(self.song_ratings.values()) / len(self.song_ratings)
     
 
+    def update_song_ratings(self, new_ratings: dict):
+        '''Updates the song ratings with new ratings.
+        :param new_ratings: a dictionary with usernames as keys and their ratings to the song as values.
+        '''
+        if not self.song_ratings:
+            self.song_ratings = {}
+        
+        self.song_ratings = new_ratings
+
+
     def get_star_image(self):
         """Returns the star image for the song based on the average value.
         :return: the image in a format that can be used for the button. To use it, you need to convert it to a PhotoImage object."""

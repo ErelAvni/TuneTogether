@@ -219,7 +219,7 @@ class MainPage(Page):
             response = self.connected_client.send_request(request)
 
             # Update song.all_ratings and refresh average
-            song.song_ratings = response.song_ratings if response.song_ratings else {}
+            song.update_song_ratings(response.song_ratings)
 
             # Refresh average image
             new_avg_image = song.get_star_image().resize((100, 20))

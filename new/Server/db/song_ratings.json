@@ -6,7 +6,8 @@
         "testuser": 4,
         "user": 3,
         "user2000": 3,
-        "Yuval": 5
+        "Yuval": 5,
+        "ori": 5
     },
     "Echoes": {
         "exampleUser": 5,
@@ -14,7 +15,8 @@
         "admin": 5,
         "testuser": 5,
         "user": 5,
-        "user2000": 5
+        "user2000": 5,
+        "ori": 5
     },
     "Bring Me To Life": {
         "exampleUser": 3,
@@ -39,7 +41,8 @@
         "admin": 5,
         "testuser": 4,
         "user": 5,
-        "user2000": 5
+        "user2000": 5,
+        "ori": 1
     },
     "Lose Yourself": {
         "exampleUser": 5,
