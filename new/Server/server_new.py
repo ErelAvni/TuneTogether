@@ -13,7 +13,7 @@ if project_root not in sys.path:
 import socket
 import threading
 import json
-from new.shared.server_request_new import ServerRequest, LOGIN, REGISTER, LOGOUT, DISCONNECT, GET_LIVE_CHAT_MESSAGES, LIVE_CHAT_MESSAGE
+from new.shared.server_request_new import ServerRequest, LOGIN, REGISTER, LOGOUT, DISCONNECT, GET_LIVE_CHAT_MESSAGES, LIVE_CHAT_MESSAGE, ADD_COMMENT
 import new.shared.DButilites as DButilites
 from new.shared.server_response import ServerResponse, OK, DATA_NOT_FOUND, UNAUTHORIZED, INVALID_REQUEST, INVALID_DATA, INTERNAL_ERROR
 from new.shared.comment import Comment
@@ -111,6 +111,9 @@ class TuneTogetherServer:
                     elif request.request_code == LIVE_CHAT_MESSAGE:
                         response_json = self.add_message_to_live_chat(Comment.from_dict(request.payload))
                     
+                    elif request.request_code == ADD_COMMENT:
+                        response_json = self.add_comment_to_comment_db(Comment.from_dict(request.payload['comment']), request.payload['song_name'])
+
                     else:
                         response = ServerResponse(INVALID_REQUEST, "Invalid request code.")
                         response_json = response.to_json()
@@ -257,6 +260,22 @@ class TuneTogetherServer:
             # Final DONE message
             done_response = ServerResponse(OK, "DONE", GET_LIVE_CHAT_MESSAGES)
             return done_response.to_json()
+
+
+    def add_comment_to_comment_db(self, comment: Comment, song_name: str):
+        """Adds a comment to the comments database.
+        """
+        if not comment or not song_name:
+            response = ServerResponse(INVALID_DATA, "Comment or song name is missing.", ADD_COMMENT)
+            return response.to_json()
+        
+        all_comments = DButilites.load_data_from_json(DButilites.COMMENTS_PATH)
+        song_comments = all_comments[comment.song_name]
+        song_comments.append(comment.to_dict())
+        DButilites.update_data_to_json(all_comments, DButilites.COMMENTS_PATH, manual_update=True)
+
+        response = ServerResponse(OK, "Comment added successfully.", ADD_COMMENT)
+        return response.to_json()
 
 
 def main():

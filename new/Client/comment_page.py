@@ -5,6 +5,8 @@ from new.shared.comment import Comment
 from new.Client.song import Song
 import new.shared.DButilites
 from tkinter import messagebox
+from new.shared.server_request_new import ServerRequest, ADD_COMMENT
+
 
 class CommentPage(Page):
     def __init__(self, parent, controller, connected_client: Client, song_name: str):
@@ -116,10 +118,17 @@ class CommentPage(Page):
             username=self.connected_client.username,
             content=comment_text
         )
-        all_comments = new.shared.DButilites.load_data_from_json(new.shared.DButilites.COMMENTS_PATH)
-        song_comments = all_comments[self.song_name]
-        song_comments.append(comment.to_dict())
-        new.shared.DButilites.update_data_to_json(all_comments, new.shared.DButilites.COMMENTS_PATH, manual_update=True)
 
-        # Clear the Text widget
-        comment_text_widget.delete("1.0", tk.END)
+        request = ServerRequest(ADD_COMMENT, {
+            "comment": comment.to_dict(),
+            "song_name": self.song_name
+        })
+        
+        response = self.client.send_request(request)
+
+        if response.response_code == "OK":
+            messagebox.showinfo("Success", "Comment added successfully.")
+            self.refresh_page(song_name=self.song_name)  # Refresh the page to show the new comment
+        
+        else:
+            messagebox.showerror("Error", f"Failed to add comment: {response.message}")
